@@ -22,6 +22,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +42,7 @@ public class TransformerManagementServiceImpl implements TransformerManagementSe
     }
 
        @Override
+    @Transactional
     public ApiResponse<Void> saveRecord(TransformerRecordsRequest transformerRecordsRequest) throws BaseException {
         long startTime = System.currentTimeMillis();
 
@@ -72,6 +74,7 @@ public class TransformerManagementServiceImpl implements TransformerManagementSe
 
 
     @Override
+    @Transactional(readOnly = true)
     public ApiResponse<TransformerRecords> getTransformerById(Long id) throws BaseException {
         long start = System.currentTimeMillis();
         try {
@@ -93,15 +96,14 @@ public class TransformerManagementServiceImpl implements TransformerManagementSe
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ApiResponse<List<TransformerRecordsResponse>> getAllTransformers() throws BaseException {
         long start = System.currentTimeMillis();
         try {
             List<TransformerRecords> transformerEntities = transformerRecordsRepository.findAll();
-            List<TransformerRecordsResponse> responseList = new ArrayList<>();
-
-            for (TransformerRecords entity : transformerEntities) {
-                responseList.add(transformerRecordsMapper.mapEntityToResponse(entity));
-            }
+            List<TransformerRecordsResponse> responseList = transformerEntities.stream()
+                    .map(transformerRecordsMapper::mapEntityToResponse)
+                    .toList();
 
             return new ApiResponse<>(ResponseCodeEnum.SUCCESS.code(), ResponseCodeEnum.SUCCESS.message(), responseList);
         } catch (Exception ex) {
@@ -112,6 +114,7 @@ public class TransformerManagementServiceImpl implements TransformerManagementSe
     }
 
     @Override
+    @Transactional
     public ApiResponse<TransformerRecords> updateTransformer(TransformerRecords transformerRecords) throws BaseException {
         long start = System.currentTimeMillis();
         try {
@@ -140,6 +143,7 @@ public class TransformerManagementServiceImpl implements TransformerManagementSe
     }
 
     @Override
+    @Transactional
     public ApiResponse<Void> deleteTransformerById(Long id) throws BaseException {
         long start = System.currentTimeMillis();
         try {

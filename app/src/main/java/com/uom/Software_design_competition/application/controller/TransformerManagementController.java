@@ -10,6 +10,7 @@ import com.uom.Software_design_competition.application.util.exception.type.BaseE
 import com.uom.Software_design_competition.domain.entity.TransformerRecords;
 import com.uom.Software_design_competition.domain.service.TransformerManagementService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ public class TransformerManagementController extends BaseController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<ApiResponse<Void>> addTransformerRecord(@RequestBody TransformerRecordsRequest transformerRecordsRequest, HttpServletRequest request) throws BaseException {
+    public ResponseEntity<ApiResponse<Void>> addTransformerRecord(@Valid @RequestBody TransformerRecordsRequest transformerRecordsRequest, HttpServletRequest request) throws BaseException {
         long startTime = System.currentTimeMillis();
         log.info(LoggingAdviceConstants.REQUEST_INITIATED, request.getMethod(), request.getRequestURI());
         ApiResponse<Void> resp = transformerManagementService.saveRecord(transformerRecordsRequest);
