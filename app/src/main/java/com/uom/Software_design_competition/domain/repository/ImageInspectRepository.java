@@ -27,6 +27,9 @@ public interface ImageInspectRepository extends JpaRepository<ImageInspect, Long
     @Query("SELECT i FROM ImageInspect i WHERE i.inspectionNo = :inspectionNo AND i.imageType = 'Thermal'")
     Optional<ImageInspect> findThermalImageByInspectionNo(@Param("inspectionNo") String inspectionNo);
 
+    @Query("SELECT i FROM ImageInspect i WHERE i.inspectionNo = :inspectionNo AND i.imageType = 'Result'")
+    Optional<ImageInspect> findResultImageByInspectionNo(@Param("inspectionNo") String inspectionNo);
+
     boolean existsByTransformerNoAndImageType(String transformerNo, String imageType);
 
     boolean existsByInspectionNoAndImageType(String inspectionNo, String imageType);
