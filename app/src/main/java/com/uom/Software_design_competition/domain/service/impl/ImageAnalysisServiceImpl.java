@@ -206,13 +206,13 @@ public class ImageAnalysisServiceImpl implements ImageAnalysisService {
                 resultImage.setTransformerNo(transformerNo);
                 resultImage.setImageType("Result");
                 resultImage.setImageData(annotatedImageData);
-                resultImage.setStatus("Completed");
+                resultImage.setStatus("Complete");
                 resultImage.setUploadDate(new java.text.SimpleDateFormat("EEE, MMM dd, yyyy hh:mm a").format(new java.util.Date()));
                 resultImage.setWeatherCondition("Analysis Result");
                 imageInspectRepository.save(resultImage);
 
-                // Update baseline and thermal image statuses to "Completed"
-                updateImageStatuses(baselineImage.get(), thermalImage.get(), "Completed");
+                // Update baseline and thermal image statuses to "Complete"
+                updateImageStatuses(baselineImage.get(), thermalImage.get(), "Complete");
 
                 log.info("Analysis completed successfully for inspection {}", inspectionNo);
                 return new ApiResponse<>(ResponseCodeEnum.SUCCESS.code(), 

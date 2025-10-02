@@ -9,7 +9,6 @@ import com.uom.Software_design_competition.application.transport.response.Inspec
 import com.uom.Software_design_competition.application.util.exception.StackTraceTracker;
 import com.uom.Software_design_competition.application.util.exception.type.BaseException;
 import com.uom.Software_design_competition.application.util.resultenum.ResponseCodeEnum;
-import com.uom.Software_design_competition.domain.entity.ImageInspect;
 import com.uom.Software_design_competition.domain.entity.InspectionRecords;
 import com.uom.Software_design_competition.domain.mapper.InspectionRecordsMapper;
 import com.uom.Software_design_competition.domain.repository.ImageInspectRepository;
@@ -142,25 +141,24 @@ public class InspectionManagementServiceImpl implements InspectionManagementServ
     }
 
     /**
-     * Get status directly from image_inspect table for the given inspection
+     * Get status based on whether analysis result exists for the inspection
+     * Status is "Complete" if result image exists, otherwise "Not Started"
      */
     private String getStatusFromImageInspect(String inspectionNo) {
         try {
-            // Find any image_inspect record for this inspection and get its status
-            List<ImageInspect> images = imageInspectRepository.findByInspectionNoOrderByUploadDateDesc(inspectionNo);
+            // Check if a Result image exists for this inspection
+            boolean hasResultImage = imageInspectRepository.existsByInspectionNoAndImageType(inspectionNo, "Result");
             
-            if (!images.isEmpty()) {
-                // Return the status from the first image record (they should all have the same status for an inspection)
-                String status = images.get(0).getStatus();
-                log.info("Status retrieved from image_inspect table for inspection {}: {}", inspectionNo, status);
-                return status != null ? status : "Not Started";
+            if (hasResultImage) {
+                log.info("Result image exists for inspection {}, status: Complete", inspectionNo);
+                return "Complete";
             } else {
-                log.info("No images found for inspection {}, returning default status: Not Started", inspectionNo);
+                log.info("No result image for inspection {}, status: Not Started", inspectionNo);
                 return "Not Started";
             }
             
         } catch (Exception ex) {
-            log.error("Error getting status from image_inspect table for inspectionNo: {}", inspectionNo, ex);
+            log.error("Error getting status for inspectionNo: {}", inspectionNo, ex);
             return "Not Started"; // Default to safe status if error occurs
         }
     }

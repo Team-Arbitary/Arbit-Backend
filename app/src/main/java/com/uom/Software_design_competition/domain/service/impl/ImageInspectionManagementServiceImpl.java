@@ -143,7 +143,16 @@ public class ImageInspectionManagementServiceImpl implements ImageInspectionMana
             Optional<ImageInspect> imageOptional = imageInspectRepository.findBaselineImageByTransformerNo(transformerNo);
 
             if (imageOptional.isPresent()) {
-                ImageInspectResponse response = imageInspectMapper.mapEntityToResponse(imageOptional.get());
+                ImageInspect image = imageOptional.get();
+                
+                // Update status based on whether result exists for this inspection
+                String inspectionNo = image.getInspectionNo();
+                if (inspectionNo != null) {
+                    boolean hasResult = imageInspectRepository.existsByInspectionNoAndImageType(inspectionNo, "Result");
+                    image.setStatus(hasResult ? "Complete" : "Not Started");
+                }
+                
+                ImageInspectResponse response = imageInspectMapper.mapEntityToResponse(image);
                 return new ApiResponse<>(ResponseCodeEnum.SUCCESS.code(), ResponseCodeEnum.SUCCESS.message(), response);
             } else {
                 return new ApiResponse<>(ResponseCodeEnum.BAD_REQUEST.code(),
@@ -171,10 +180,6 @@ public class ImageInspectionManagementServiceImpl implements ImageInspectionMana
 
             ImageInspect existingImage = existingImageOptional.get();
 
-            // Update status to "In progress"
-            existingImage.setStatus("In progress");
-            imageInspectRepository.save(existingImage);
-
             byte[] imageData = null;
             if (imageRequest.getImageFile() != null && !imageRequest.getImageFile().isEmpty()) {
                 // Validate file size (max 100MB)
@@ -194,8 +199,8 @@ public class ImageInspectionManagementServiceImpl implements ImageInspectionMana
 
             ImageInspect updatedImage = imageInspectMapper.mapRequestToEntityUpdate(existingImage, imageRequest, imageData);
 
-            // Update status to "Completed" after successful update
-            updatedImage.setStatus("Completed");
+            // Set status to "Not Started" since analysis hasn't been done yet
+            updatedImage.setStatus("Not Started");
             imageInspectRepository.save(updatedImage);
 
             return new ApiResponse<>(ResponseCodeEnum.SUCCESS.code(), "Baseline image updated successfully");
@@ -264,7 +269,13 @@ public class ImageInspectionManagementServiceImpl implements ImageInspectionMana
             Optional<ImageInspect> imageOptional = imageInspectRepository.findThermalImageByInspectionNo(inspectionNo);
 
             if (imageOptional.isPresent()) {
-                ImageInspectResponse response = imageInspectMapper.mapEntityToResponse(imageOptional.get());
+                ImageInspect image = imageOptional.get();
+                
+                // Update status based on whether result exists for this inspection
+                boolean hasResult = imageInspectRepository.existsByInspectionNoAndImageType(inspectionNo, "Result");
+                image.setStatus(hasResult ? "Complete" : "Not Started");
+                
+                ImageInspectResponse response = imageInspectMapper.mapEntityToResponse(image);
                 return new ApiResponse<>(ResponseCodeEnum.SUCCESS.code(), ResponseCodeEnum.SUCCESS.message(), response);
             } else {
                 return new ApiResponse<>(ResponseCodeEnum.BAD_REQUEST.code(),
@@ -292,10 +303,6 @@ public class ImageInspectionManagementServiceImpl implements ImageInspectionMana
 
             ImageInspect existingImage = existingImageOptional.get();
 
-            // Update status to "In progress"
-            existingImage.setStatus("In progress");
-            imageInspectRepository.save(existingImage);
-
             byte[] imageData = null;
             if (imageRequest.getImageFile() != null && !imageRequest.getImageFile().isEmpty()) {
                 // Validate file size (max 10MB)
@@ -315,8 +322,8 @@ public class ImageInspectionManagementServiceImpl implements ImageInspectionMana
 
             ImageInspect updatedImage = imageInspectMapper.mapRequestToEntityUpdate(existingImage, imageRequest, imageData);
 
-            // Update status to "Completed" after successful update
-            updatedImage.setStatus("Completed");
+            // Set status to "Not Started" since analysis hasn't been done yet
+            updatedImage.setStatus("Not Started");
             imageInspectRepository.save(updatedImage);
 
             return new ApiResponse<>(ResponseCodeEnum.SUCCESS.code(), "Thermal image updated successfully");
@@ -385,7 +392,12 @@ public class ImageInspectionManagementServiceImpl implements ImageInspectionMana
             Optional<ImageInspect> imageOptional = imageInspectRepository.findResultImageByInspectionNo(inspectionNo);
 
             if (imageOptional.isPresent()) {
-                ImageInspectResponse response = imageInspectMapper.mapEntityToResponse(imageOptional.get());
+                ImageInspect image = imageOptional.get();
+                
+                // Result images always have "Complete" status
+                image.setStatus("Complete");
+                
+                ImageInspectResponse response = imageInspectMapper.mapEntityToResponse(image);
                 return new ApiResponse<>(ResponseCodeEnum.SUCCESS.code(), ResponseCodeEnum.SUCCESS.message(), response);
             } else {
                 return new ApiResponse<>(ResponseCodeEnum.BAD_REQUEST.code(),
