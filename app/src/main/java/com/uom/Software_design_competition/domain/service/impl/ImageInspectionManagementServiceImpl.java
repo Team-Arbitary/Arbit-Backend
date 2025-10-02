@@ -149,7 +149,13 @@ public class ImageInspectionManagementServiceImpl implements ImageInspectionMana
                 String inspectionNo = image.getInspectionNo();
                 if (inspectionNo != null) {
                     boolean hasResult = imageInspectRepository.existsByInspectionNoAndImageType(inspectionNo, "Result");
-                    image.setStatus(hasResult ? "Complete" : "Not Started");
+                    String newStatus = hasResult ? "Complete" : "Not Started";
+                    
+                    // Update and save status if it has changed
+                    if (!newStatus.equals(image.getStatus())) {
+                        image.setStatus(newStatus);
+                        imageInspectRepository.save(image);
+                    }
                 }
                 
                 ImageInspectResponse response = imageInspectMapper.mapEntityToResponse(image);
@@ -273,7 +279,13 @@ public class ImageInspectionManagementServiceImpl implements ImageInspectionMana
                 
                 // Update status based on whether result exists for this inspection
                 boolean hasResult = imageInspectRepository.existsByInspectionNoAndImageType(inspectionNo, "Result");
-                image.setStatus(hasResult ? "Complete" : "Not Started");
+                String newStatus = hasResult ? "Complete" : "Not Started";
+                
+                // Update and save status if it has changed
+                if (!newStatus.equals(image.getStatus())) {
+                    image.setStatus(newStatus);
+                    imageInspectRepository.save(image);
+                }
                 
                 ImageInspectResponse response = imageInspectMapper.mapEntityToResponse(image);
                 return new ApiResponse<>(ResponseCodeEnum.SUCCESS.code(), ResponseCodeEnum.SUCCESS.message(), response);

@@ -6,8 +6,10 @@ import com.uom.Software_design_competition.application.util.exception.type.BaseE
 import com.uom.Software_design_competition.application.util.resultenum.ResponseCodeEnum;
 import com.uom.Software_design_competition.domain.entity.AnalysisResult;
 import com.uom.Software_design_competition.domain.entity.ImageInspect;
+import com.uom.Software_design_competition.domain.entity.InspectionRecords;
 import com.uom.Software_design_competition.domain.repository.AnalysisResultRepository;
 import com.uom.Software_design_competition.domain.repository.ImageInspectRepository;
+import com.uom.Software_design_competition.domain.repository.InspectionRecordsRepository;
 import com.uom.Software_design_competition.domain.service.ImageAnalysisService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +32,7 @@ public class ImageAnalysisServiceImpl implements ImageAnalysisService {
 
     private final ImageInspectRepository imageInspectRepository;
     private final AnalysisResultRepository analysisResultRepository;
+    private final InspectionRecordsRepository inspectionRecordsRepository;
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
@@ -38,10 +41,12 @@ public class ImageAnalysisServiceImpl implements ImageAnalysisService {
 
     public ImageAnalysisServiceImpl(ImageInspectRepository imageInspectRepository,
                                    AnalysisResultRepository analysisResultRepository,
+                                   InspectionRecordsRepository inspectionRecordsRepository,
                                    RestTemplate restTemplate,
                                    ObjectMapper objectMapper) {
         this.imageInspectRepository = imageInspectRepository;
         this.analysisResultRepository = analysisResultRepository;
+        this.inspectionRecordsRepository = inspectionRecordsRepository;
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
     }
@@ -214,6 +219,9 @@ public class ImageAnalysisServiceImpl implements ImageAnalysisService {
                 // Update baseline and thermal image statuses to "Complete"
                 updateImageStatuses(baselineImage.get(), thermalImage.get(), "Complete");
 
+                // Update inspection record status to "Complete"
+                updateInspectionRecordStatus(inspectionNo, "Complete");
+
                 log.info("Analysis completed successfully for inspection {}", inspectionNo);
                 return new ApiResponse<>(ResponseCodeEnum.SUCCESS.code(), 
                         "Analysis completed successfully", analysisResult);
@@ -321,5 +329,21 @@ public class ImageAnalysisServiceImpl implements ImageAnalysisService {
     private void updateImageStatus(ImageInspect image, String status) {
         image.setStatus(status);
         imageInspectRepository.save(image);
+    }
+
+    private void updateInspectionRecordStatus(String inspectionNo, String status) {
+        try {
+            Optional<InspectionRecords> inspectionRecord = inspectionRecordsRepository.findByInspectionNo(inspectionNo);
+            if (inspectionRecord.isPresent()) {
+                InspectionRecords record = inspectionRecord.get();
+                record.setStatus(status);
+                inspectionRecordsRepository.save(record);
+                log.info("Updated inspection record status for inspection {} to {}", inspectionNo, status);
+            } else {
+                log.warn("Inspection record not found for inspection {}", inspectionNo);
+            }
+        } catch (Exception ex) {
+            log.error("Error updating inspection record status for inspection {}: {}", inspectionNo, ex.getMessage());
+        }
     }
 }

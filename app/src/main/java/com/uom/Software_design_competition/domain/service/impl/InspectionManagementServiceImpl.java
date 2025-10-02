@@ -173,7 +173,14 @@ public class InspectionManagementServiceImpl implements InspectionManagementServ
             for (InspectionRecords entity : inspectionEntities) {
                 // Get status directly from image_inspect table
                 String directStatus = getStatusFromImageInspect(entity.getInspectionNo());
-                entity.setStatus(directStatus);
+                
+                // Update entity status if it's different
+                if (!directStatus.equals(entity.getStatus())) {
+                    entity.setStatus(directStatus);
+                    inspectionRecordsRepository.save(entity);
+                    log.debug("Updated inspection {} status from {} to {}", 
+                            entity.getInspectionNo(), entity.getStatus(), directStatus);
+                }
                 
                 responseList.add(inspectionRecordsMapper.mapEntityToResponse(entity));
             }
