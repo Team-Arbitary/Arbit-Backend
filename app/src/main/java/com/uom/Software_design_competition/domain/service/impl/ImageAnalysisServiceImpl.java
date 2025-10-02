@@ -131,12 +131,19 @@ public class ImageAnalysisServiceImpl implements ImageAnalysisService {
 
             // Call analysis API
             log.info("Calling analysis API for inspection {}", inspectionNo);
-            ResponseEntity<String> response = restTemplate.exchange(
-                    analysisApiUrl + "/detect",
-                    HttpMethod.POST,
-                    requestEntity,
-                    String.class
-            );
+            ResponseEntity<String> response;
+            try {
+                response = restTemplate.exchange(
+                        analysisApiUrl + "/detect",
+                        HttpMethod.POST,
+                        requestEntity,
+                        String.class
+                );
+                log.info("Analysis API response status: {}", response.getStatusCode());
+            } catch (Exception apiEx) {
+                log.error("Error calling analysis API: {}", apiEx.getMessage());
+                throw new RuntimeException("Analysis API is not available: " + apiEx.getMessage());
+            }
 
             if (response.getStatusCode() == HttpStatus.OK) {
                 // For JSON response, we need to get the annotated image separately
@@ -146,25 +153,52 @@ public class ImageAnalysisServiceImpl implements ImageAnalysisService {
                 body.replace("return_format", List.of("annotated"));
                 HttpEntity<MultiValueMap<String, Object>> annotatedRequest = new HttpEntity<>(body, headers);
                 
-                ResponseEntity<byte[]> annotatedResponse = restTemplate.exchange(
-                        analysisApiUrl + "/detect",
-                        HttpMethod.POST,
-                        annotatedRequest,
-                        byte[].class
-                );
+                ResponseEntity<byte[]> annotatedResponse;
+                try {
+                    annotatedResponse = restTemplate.exchange(
+                            analysisApiUrl + "/detect",
+                            HttpMethod.POST,
+                            annotatedRequest,
+                            byte[].class
+                    );
+                    log.info("Annotated image API response status: {}", annotatedResponse.getStatusCode());
+                } catch (Exception apiEx) {
+                    log.error("Error getting annotated image from API: {}", apiEx.getMessage());
+                    throw new RuntimeException("Failed to get annotated image: " + apiEx.getMessage());
+                }
 
                 byte[] annotatedImageData = annotatedResponse.getBody();
                 
-                // Save analysis result in AnalysisResult table
-                AnalysisResult analysisResult = new AnalysisResult(
-                        inspectionNo, 
-                        transformerNo, 
-                        annotatedImageData, 
-                        jsonResult, 
-                        "SUCCESS"
-                );
-                analysisResult.setProcessingTimeMs(System.currentTimeMillis() - startTime);
-                analysisResultRepository.save(analysisResult);
+                // Debug logging
+                if (annotatedImageData == null) {
+                    log.warn("Received null annotated image data from analysis API");
+                    annotatedImageData = new byte[0]; // Use empty array instead of null
+                } else {
+                    log.info("Received annotated image data: {} bytes, type: {}", 
+                            annotatedImageData.length, annotatedImageData.getClass().getName());
+                }
+                
+                // Save analysis result in AnalysisResult table with proper error handling
+                AnalysisResult analysisResult;
+                try {
+                    analysisResult = new AnalysisResult(
+                            inspectionNo, 
+                            transformerNo, 
+                            annotatedImageData, 
+                            jsonResult, 
+                            "SUCCESS"
+                    );
+                    analysisResult.setProcessingTimeMs(System.currentTimeMillis() - startTime);
+                    
+                    log.info("Saving analysis result for inspection {}, image data size: {} bytes", 
+                            inspectionNo, annotatedImageData != null ? annotatedImageData.length : 0);
+                    
+                    analysisResultRepository.save(analysisResult);
+                    log.info("Analysis result saved successfully for inspection {}", inspectionNo);
+                } catch (Exception saveEx) {
+                    log.error("Error saving analysis result for inspection {}: {}", inspectionNo, saveEx.getMessage(), saveEx);
+                    throw new RuntimeException("Failed to save analysis result: " + saveEx.getMessage(), saveEx);
+                }
 
                 // Save result image in ImageInspect table with "Result" type
                 ImageInspect resultImage = new ImageInspect();
@@ -189,20 +223,55 @@ public class ImageAnalysisServiceImpl implements ImageAnalysisService {
             }
 
         } catch (Exception ex) {
-            log.error("Error performing analysis for inspection {}: {}", inspectionNo, ex.getMessage());
+            log.error("Error performing analysis for inspection {}: {}", inspectionNo, ex.getMessage(), ex);
             
-            // Save failed analysis result
-            AnalysisResult failedResult = new AnalysisResult();
-            failedResult.setInspectionNo(inspectionNo);
-            failedResult.setTransformerNo(transformerNo);
-            failedResult.setAnalysisStatus("FAILED");
-            failedResult.setErrorMessage(ex.getMessage());
-            failedResult.setProcessingTimeMs(System.currentTimeMillis() - startTime);
-            
-            analysisResultRepository.save(failedResult);
+            // Save failed analysis result with proper error handling
+            try {
+                AnalysisResult failedResult = new AnalysisResult();
+                failedResult.setInspectionNo(inspectionNo);
+                failedResult.setTransformerNo(transformerNo);
+                failedResult.setAnalysisStatus("FAILED");
+                failedResult.setErrorMessage(ex.getMessage());
+                failedResult.setProcessingTimeMs(System.currentTimeMillis() - startTime);
+                failedResult.setAnalysisDate(java.time.LocalDateTime.now());
+                // Explicitly set annotated image data to null for failed cases
+                failedResult.setAnnotatedImageData(null);
+                
+                analysisResultRepository.save(failedResult);
+                log.info("Failed analysis result saved for inspection {}", inspectionNo);
+            } catch (Exception saveEx) {
+                log.error("Error saving failed analysis result for inspection {}: {}", inspectionNo, saveEx.getMessage(), saveEx);
+            }
 
             throw new BaseException(ResponseCodeEnum.INTERNAL_SERVER_ERROR.code(), 
                     "Analysis failed: " + ex.getMessage());
+        }
+    }
+
+    @Override
+    public ApiResponse<AnalysisResult> performAnalysisWithInspectionNo(String inspectionNo) throws BaseException {
+        try {
+            // Get the thermal image first to find the transformer number
+            Optional<ImageInspect> thermalImage = imageInspectRepository.findThermalImageByInspectionNo(inspectionNo);
+            
+            if (!thermalImage.isPresent()) {
+                return new ApiResponse<>(ResponseCodeEnum.BAD_REQUEST.code(), 
+                        "Thermal image not found for inspection: " + inspectionNo);
+            }
+            
+            String transformerNo = thermalImage.get().getTransformerNo();
+            if (transformerNo == null || transformerNo.trim().isEmpty()) {
+                return new ApiResponse<>(ResponseCodeEnum.BAD_REQUEST.code(), 
+                        "Transformer number not found in thermal image data");
+            }
+            
+            // Now perform analysis with both inspection and transformer numbers
+            return performAnalysis(inspectionNo, transformerNo);
+            
+        } catch (Exception ex) {
+            log.error("Error performing analysis for inspection {}: {}", inspectionNo, ex.getMessage());
+            throw new BaseException(ResponseCodeEnum.INTERNAL_SERVER_ERROR.code(), 
+                    "Failed to perform analysis: " + ex.getMessage());
         }
     }
 

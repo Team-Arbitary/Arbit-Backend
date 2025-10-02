@@ -37,6 +37,17 @@ public class ImageAnalysisController extends BaseController {
         return setResponseEntity(resp);
     }
 
+    // API 1b: Simplified Manual Analysis (Get transformer from inspection)
+    @PostMapping("/analyze/{inspectionNo}")
+    public ResponseEntity<ApiResponse<AnalysisResult>> triggerAnalysisSimple(@PathVariable String inspectionNo,
+                                                                           HttpServletRequest request) throws BaseException {
+        long startTime = System.currentTimeMillis();
+        log.info(LoggingAdviceConstants.REQUEST_INITIATED, request.getMethod(), request.getRequestURI());
+        ApiResponse<AnalysisResult> resp = imageAnalysisService.performAnalysisWithInspectionNo(inspectionNo);
+        log.info(LoggingAdviceConstants.REQUEST_TERMINATED, System.currentTimeMillis() - startTime, resp.getResponseDescription());
+        return setResponseEntity(resp);
+    }
+
     // API 2: Get Analysis Result by Inspection Number
     @GetMapping("/result/{inspectionNo}")
     public ResponseEntity<ApiResponse<AnalysisResult>> getAnalysisResult(@PathVariable String inspectionNo,

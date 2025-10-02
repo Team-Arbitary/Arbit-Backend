@@ -18,6 +18,11 @@ public interface ImageAnalysisService {
     ApiResponse<AnalysisResult> performAnalysis(String inspectionNo, String transformerNo) throws BaseException;
 
     /**
+     * Perform analysis using only inspection number (gets transformer from thermal image)
+     */
+    ApiResponse<AnalysisResult> performAnalysisWithInspectionNo(String inspectionNo) throws BaseException;
+
+    /**
      * Get analysis result by inspection number
      */
     ApiResponse<AnalysisResult> getAnalysisResult(String inspectionNo) throws BaseException;

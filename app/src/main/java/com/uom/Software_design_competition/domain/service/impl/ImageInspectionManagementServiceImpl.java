@@ -11,7 +11,6 @@ import com.uom.Software_design_competition.domain.entity.ImageInspect;
 import com.uom.Software_design_competition.domain.mapper.ImageInspectMapper;
 import com.uom.Software_design_competition.domain.repository.AnalysisResultRepository;
 import com.uom.Software_design_competition.domain.repository.ImageInspectRepository;
-import com.uom.Software_design_competition.domain.service.ImageAnalysisService;
 import com.uom.Software_design_competition.domain.service.ImageInspectionManagementService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -26,16 +25,13 @@ public class ImageInspectionManagementServiceImpl implements ImageInspectionMana
 
     private final ImageInspectRepository imageInspectRepository;
     private final ImageInspectMapper imageInspectMapper;
-    private final ImageAnalysisService imageAnalysisService;
     private final AnalysisResultRepository analysisResultRepository;
 
     public ImageInspectionManagementServiceImpl(ImageInspectRepository imageInspectRepository,
                                                 ImageInspectMapper imageInspectMapper,
-                                                ImageAnalysisService imageAnalysisService,
                                                 AnalysisResultRepository analysisResultRepository) {
         this.imageInspectRepository = imageInspectRepository;
         this.imageInspectMapper = imageInspectMapper;
-        this.imageAnalysisService = imageAnalysisService;
         this.analysisResultRepository = analysisResultRepository;
     }
 
@@ -127,15 +123,8 @@ public class ImageInspectionManagementServiceImpl implements ImageInspectionMana
             ApiResponse<Void> response = new ApiResponse<>(ResponseCodeEnum.SUCCESS.code(),
                     imageRequest.getImageType() + " image uploaded successfully");
 
-            // Trigger analysis workflow asynchronously (after response is sent)
-            if ("Baseline".equals(imageRequest.getImageType()) && imageRequest.getTransformerNo() != null) {
-                // For baseline images, check if there are any thermal images for any inspection
-                imageAnalysisService.updateInspectionStatus("", imageRequest.getTransformerNo());
-            } else if ("Thermal".equals(imageRequest.getImageType()) && imageRequest.getInspectionNo() != null) {
-                // For thermal images, check analysis for this specific inspection
-                imageAnalysisService.updateInspectionStatus(imageRequest.getInspectionNo(), 
-                        imageRequest.getTransformerNo() != null ? imageRequest.getTransformerNo() : "");
-            }
+            // Note: Automatic analysis has been disabled. 
+            // Use the manual analysis endpoint to trigger analysis when needed.
 
             return response;
 

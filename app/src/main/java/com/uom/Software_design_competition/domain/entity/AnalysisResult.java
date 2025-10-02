@@ -24,8 +24,7 @@ public class AnalysisResult {
     @Column(name = "transformer_no", nullable = false)
     private String transformerNo;
 
-    @Lob
-    @Column(name = "annotated_image_data", nullable = false)
+    @Column(name = "annotated_image_data", columnDefinition = "BYTEA")
     private byte[] annotatedImageData;
 
     @Column(name = "analysis_date", nullable = false)
