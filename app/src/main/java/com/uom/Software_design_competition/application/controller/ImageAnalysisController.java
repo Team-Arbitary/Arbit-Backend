@@ -82,4 +82,16 @@ public class ImageAnalysisController extends BaseController {
         log.info(LoggingAdviceConstants.REQUEST_TERMINATED, System.currentTimeMillis() - startTime, resp.getResponseDescription());
         return setResponseEntity(resp);
     }
+
+    // API 5: Test endpoint to directly update inspection status (for testing ID fallback logic)
+    @PostMapping("/test-update-status/{inspectionNo}")
+    public ResponseEntity<ApiResponse<String>> testUpdateStatus(@PathVariable String inspectionNo,
+                                                                HttpServletRequest request) throws BaseException {
+        long startTime = System.currentTimeMillis();
+        log.info(LoggingAdviceConstants.REQUEST_INITIATED, request.getMethod(), request.getRequestURI());
+        String result = imageAnalysisService.testStatusUpdate(inspectionNo);
+        ApiResponse<String> resp = new ApiResponse<>("200", "Status update test completed", result);
+        log.info(LoggingAdviceConstants.REQUEST_TERMINATED, System.currentTimeMillis() - startTime, resp.getResponseDescription());
+        return setResponseEntity(resp);
+    }
 }

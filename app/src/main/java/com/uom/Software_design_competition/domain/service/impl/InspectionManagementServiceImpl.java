@@ -11,7 +11,6 @@ import com.uom.Software_design_competition.application.util.exception.type.BaseE
 import com.uom.Software_design_competition.application.util.resultenum.ResponseCodeEnum;
 import com.uom.Software_design_competition.domain.entity.InspectionRecords;
 import com.uom.Software_design_competition.domain.mapper.InspectionRecordsMapper;
-import com.uom.Software_design_competition.domain.repository.ImageInspectRepository;
 import com.uom.Software_design_competition.domain.repository.InspectionRecordsRepository;
 import com.uom.Software_design_competition.domain.service.InspectionManagementService;
 import com.uom.Software_design_competition.domain.util.QueryBuilder;
@@ -35,19 +34,16 @@ public class InspectionManagementServiceImpl implements InspectionManagementServ
     private final InspectionRecordsRepository inspectionRecordsRepository;
     private final InspectionRecordsMapper inspectionRecordsMapper;
     private final QueryBuilder queryBuilder;
-    private final ImageInspectRepository imageInspectRepository;
 
     @Autowired
     private SequenceGeneratorService sequenceGeneratorService;
 
     public InspectionManagementServiceImpl(InspectionRecordsRepository inspectionRecordsRepository,
                                            InspectionRecordsMapper inspectionRecordsMapper,
-                                           QueryBuilder queryBuilder,
-                                           ImageInspectRepository imageInspectRepository) {
+                                           QueryBuilder queryBuilder) {
         this.inspectionRecordsRepository = inspectionRecordsRepository;
         this.inspectionRecordsMapper = inspectionRecordsMapper;
         this.queryBuilder = queryBuilder;
-        this.imageInspectRepository = imageInspectRepository;
     }
 
     @Override
@@ -100,10 +96,8 @@ public class InspectionManagementServiceImpl implements InspectionManagementServ
 
             List<InspectionRecordsResponse> responseList = new ArrayList<>();
             for (InspectionRecords entity : inspectionEntities) {
-                // Get status directly from image_inspect table
-                String directStatus = getStatusFromImageInspect(entity.getInspectionNo());
-                entity.setStatus(directStatus);
-                
+                // Use the actual status from the database
+                // (This preserves the "Completed" status set after successful analysis)
                 responseList.add(inspectionRecordsMapper.mapEntityToResponse(entity));
             }
 
@@ -124,10 +118,8 @@ public class InspectionManagementServiceImpl implements InspectionManagementServ
                     .orElseThrow(() -> new BaseException(ResponseCodeEnum.BAD_REQUEST.code(),
                             "Inspection record not found with ID: " + id));
 
-            // Get status directly from image_inspect table
-            String directStatus = getStatusFromImageInspect(inspectionRecord.getInspectionNo());
-            inspectionRecord.setStatus(directStatus);
-
+            // Return the inspection record with its actual status from the database
+            // (This preserves the "Completed" status set after successful analysis)
             return new ApiResponse<>(ResponseCodeEnum.SUCCESS.code(), ResponseCodeEnum.SUCCESS.message(), inspectionRecord);
         } catch (BaseException ex) {
             log.error(LoggingAdviceConstants.EXCEPTION_STACK_TRACE, System.currentTimeMillis() - start,
@@ -140,29 +132,6 @@ public class InspectionManagementServiceImpl implements InspectionManagementServ
         }
     }
 
-    /**
-     * Get status based on whether analysis result exists for the inspection
-     * Status is "Complete" if result image exists, otherwise "Not Started"
-     */
-    private String getStatusFromImageInspect(String inspectionNo) {
-        try {
-            // Check if a Result image exists for this inspection
-            boolean hasResultImage = imageInspectRepository.existsByInspectionNoAndImageType(inspectionNo, "Result");
-            
-            if (hasResultImage) {
-                log.info("Result image exists for inspection {}, status: Complete", inspectionNo);
-                return "Complete";
-            } else {
-                log.info("No result image for inspection {}, status: Not Started", inspectionNo);
-                return "Not Started";
-            }
-            
-        } catch (Exception ex) {
-            log.error("Error getting status for inspectionNo: {}", inspectionNo, ex);
-            return "Not Started"; // Default to safe status if error occurs
-        }
-    }
-
     @Override
     public ApiResponse<List<InspectionRecordsResponse>> getAllInspections() throws BaseException {
         long start = System.currentTimeMillis();
@@ -171,17 +140,8 @@ public class InspectionManagementServiceImpl implements InspectionManagementServ
             List<InspectionRecordsResponse> responseList = new ArrayList<>();
 
             for (InspectionRecords entity : inspectionEntities) {
-                // Get status directly from image_inspect table
-                String directStatus = getStatusFromImageInspect(entity.getInspectionNo());
-                
-                // Update entity status if it's different
-                if (!directStatus.equals(entity.getStatus())) {
-                    entity.setStatus(directStatus);
-                    inspectionRecordsRepository.save(entity);
-                    log.debug("Updated inspection {} status from {} to {}", 
-                            entity.getInspectionNo(), entity.getStatus(), directStatus);
-                }
-                
+                // Use the actual status from the database
+                // (This preserves the "Completed" status set after successful analysis)
                 responseList.add(inspectionRecordsMapper.mapEntityToResponse(entity));
             }
 

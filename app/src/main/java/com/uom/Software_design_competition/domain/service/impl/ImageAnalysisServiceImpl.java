@@ -219,8 +219,8 @@ public class ImageAnalysisServiceImpl implements ImageAnalysisService {
                 // Update baseline and thermal image statuses to "Complete"
                 updateImageStatuses(baselineImage.get(), thermalImage.get(), "Complete");
 
-                // Update inspection record status to "Complete"
-                updateInspectionRecordStatus(inspectionNo, "Complete");
+                // Update inspection record status to "Completed"
+                updateInspectionRecordStatus(inspectionNo, "Completed");
 
                 log.info("Analysis completed successfully for inspection {}", inspectionNo);
                 return new ApiResponse<>(ResponseCodeEnum.SUCCESS.code(), 
@@ -333,17 +333,75 @@ public class ImageAnalysisServiceImpl implements ImageAnalysisService {
 
     private void updateInspectionRecordStatus(String inspectionNo, String status) {
         try {
+            // First try to find by exact inspection number match
             Optional<InspectionRecords> inspectionRecord = inspectionRecordsRepository.findByInspectionNo(inspectionNo);
+            
+            // If not found and inspectionNo is a number, try to find by ID
+            if (!inspectionRecord.isPresent()) {
+                try {
+                    Long id = Long.parseLong(inspectionNo);
+                    inspectionRecord = inspectionRecordsRepository.findById(id);
+                    log.info("Found inspection record by ID: {} for inspection number: {}", id, inspectionNo);
+                } catch (NumberFormatException e) {
+                    log.debug("Inspection number {} is not a valid ID", inspectionNo);
+                }
+            }
+            
             if (inspectionRecord.isPresent()) {
                 InspectionRecords record = inspectionRecord.get();
+                String oldStatus = record.getStatus();
                 record.setStatus(status);
                 inspectionRecordsRepository.save(record);
-                log.info("Updated inspection record status for inspection {} to {}", inspectionNo, status);
+                log.info("Updated inspection record status for inspection {} (record ID: {}) from '{}' to '{}'", 
+                        inspectionNo, record.getId(), oldStatus, status);
             } else {
-                log.warn("Inspection record not found for inspection {}", inspectionNo);
+                log.warn("Inspection record not found for inspection number: {}", inspectionNo);
             }
         } catch (Exception ex) {
-            log.error("Error updating inspection record status for inspection {}: {}", inspectionNo, ex.getMessage());
+            log.error("Error updating inspection record status for inspection {}: {}", inspectionNo, ex.getMessage(), ex);
+        }
+    }
+
+    @Override
+    @Transactional
+    public String testStatusUpdate(String inspectionNo) throws BaseException {
+        try {
+            log.info("Testing status update for inspection number: {}", inspectionNo);
+            
+            // First try to find by exact inspection number match
+            Optional<InspectionRecords> inspectionRecord = inspectionRecordsRepository.findByInspectionNo(inspectionNo);
+            String foundBy = "inspection_no";
+            
+            // If not found and inspectionNo is a number, try to find by ID
+            if (!inspectionRecord.isPresent()) {
+                try {
+                    Long id = Long.parseLong(inspectionNo);
+                    inspectionRecord = inspectionRecordsRepository.findById(id);
+                    foundBy = "id=" + id;
+                    log.info("Found inspection record by ID: {} for inspection number: {}", id, inspectionNo);
+                } catch (NumberFormatException e) {
+                    log.debug("Inspection number {} is not a valid ID", inspectionNo);
+                    return "FAILED: Inspection number '" + inspectionNo + "' not found by inspection_no or ID";
+                }
+            }
+            
+            if (inspectionRecord.isPresent()) {
+                InspectionRecords record = inspectionRecord.get();
+                String oldStatus = record.getStatus();
+                record.setStatus("Completed");
+                inspectionRecordsRepository.save(record);
+                log.info("Test: Updated inspection record status for inspection {} (found by: {}, record ID: {}) from '{}' to 'Completed'", 
+                        inspectionNo, foundBy, record.getId(), oldStatus);
+                return String.format("SUCCESS: Updated record ID=%d (inspection_no='%s', found by: %s) from '%s' to 'Completed'",
+                        record.getId(), record.getInspectionNo(), foundBy, oldStatus);
+            } else {
+                log.warn("Inspection record not found for inspection number: {}", inspectionNo);
+                return "FAILED: Inspection record not found for inspection number: " + inspectionNo;
+            }
+        } catch (Exception ex) {
+            log.error("Error testing status update for inspection {}: {}", inspectionNo, ex.getMessage(), ex);
+            throw new BaseException(ResponseCodeEnum.INTERNAL_SERVER_ERROR.code(), 
+                    "Test failed: " + ex.getMessage());
         }
     }
 }
