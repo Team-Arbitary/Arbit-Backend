@@ -20,7 +20,7 @@ info:
 
 spring:
   datasource:
-    url: jdbc:postgresql://transformer_inspection_db_user:b0NTLBIGpuUPM5FIQqqgvuh8gkEJZExX@dpg-d3gb8du3jp1c73ek2cl0-a/transformer_inspection_db
+    url: jdbc:postgresql://dpg-d3gb8du3jp1c73ek2cl0-a.singapore-postgres.render.com:5432/transformer_inspection_db
     username: transformer_inspection_db_user
     password: b0NTLBIGpuUPM5FIQqqgvuh8gkEJZExX
     driver-class-name: org.postgresql.Driver
