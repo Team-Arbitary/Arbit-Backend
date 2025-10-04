@@ -34,7 +34,7 @@ SERVER_PORT=5509
 SPRING_PROFILES_ACTIVE=prod
 
 # Analysis API (optional)
-ANALYSIS_API_URL=http://localhost:8000
+ANALYSIS_API_URL=http://192.248.10.121:8000
 EOF
     echo "✅ Created .env file with default values"
 fi

@@ -15,7 +15,7 @@
 - **Purpose**: Automated analysis when both baseline and thermal images are uploaded
 - **Features**:
   - @Async processing to prevent frontend blocking
-  - Calls external API at localhost:8000/detect
+  - Calls external API at 192.248.10.121:8000/detect
   - Automatic trigger when both images are present
   - Status management: "Not Started" → "In Progress" → "Completed"
   - Saves annotated results to database

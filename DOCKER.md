@@ -66,7 +66,7 @@ You can override application properties using environment variables:
 | `SPRING_DATASOURCE_USERNAME` | `postgres` | Database username |
 | `SPRING_DATASOURCE_PASSWORD` | `1234` | Database password |
 | `SERVER_PORT` | `5509` | Application port |
-| `ANALYSIS_API_URL` | `http://localhost:8000` | Python analysis API URL |
+| `ANALYSIS_API_URL` | `http://192.248.10.121:8000` | Python analysis API URL |
 
 Example with custom database:
 

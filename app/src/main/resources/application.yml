@@ -7,7 +7,7 @@ base-url:
 # Analysis API configuration
 analysis:
   api:
-    url: http://localhost:8000
+    url: http://192.248.10.121:8000
 
 log:
   identifierKey: UUID
