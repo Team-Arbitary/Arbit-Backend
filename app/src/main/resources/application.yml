@@ -20,9 +20,9 @@ info:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/trasformer_inspection_db
-    username: postgres
-    password: 1234
+    url: jdbc:postgresql://transformer_inspection_db_user:b0NTLBIGpuUPM5FIQqqgvuh8gkEJZExX@dpg-d3gb8du3jp1c73ek2cl0-a/transformer_inspection_db
+    username: transformer_inspection_db_user
+    password: b0NTLBIGpuUPM5FIQqqgvuh8gkEJZExX
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 20
