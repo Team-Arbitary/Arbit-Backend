@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("${base-url.context}" + "/image-inspection-management")
-@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:3000", "http://127.0.0.1:8080"}, 
+@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:3000", "http://127.0.0.1:8080", "https://arbit-frontend.vercel.app"}, 
              allowCredentials = "true")
 @Slf4j
 public class ImageInspectionManagementController extends BaseController {
