@@ -36,7 +36,7 @@ public class ImageAnalysisServiceImpl implements ImageAnalysisService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
-    @Value("${analysis.api.url:http://192.248.10.121:8000}")
+    @Value("${analysis.api.url:http://192.248.10.121:8082}")
     private String analysisApiUrl;
 
     public ImageAnalysisServiceImpl(ImageInspectRepository imageInspectRepository,
