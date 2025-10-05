@@ -9,6 +9,7 @@ import com.uom.Software_design_competition.application.util.exception.type.BaseE
 import com.uom.Software_design_competition.application.util.resultenum.ResponseCodeEnum;
 import com.uom.Software_design_competition.domain.entity.ImageInspect;
 import com.uom.Software_design_competition.domain.mapper.ImageInspectMapper;
+import com.uom.Software_design_competition.domain.repository.AnalysisResultRepository;
 import com.uom.Software_design_competition.domain.repository.ImageInspectRepository;
 import com.uom.Software_design_competition.domain.service.ImageInspectionManagementService;
 
@@ -24,11 +25,14 @@ public class ImageInspectionManagementServiceImpl implements ImageInspectionMana
 
     private final ImageInspectRepository imageInspectRepository;
     private final ImageInspectMapper imageInspectMapper;
+    private final AnalysisResultRepository analysisResultRepository;
 
     public ImageInspectionManagementServiceImpl(ImageInspectRepository imageInspectRepository,
-                                                ImageInspectMapper imageInspectMapper) {
+                                                ImageInspectMapper imageInspectMapper,
+                                                AnalysisResultRepository analysisResultRepository) {
         this.imageInspectRepository = imageInspectRepository;
         this.imageInspectMapper = imageInspectMapper;
+        this.analysisResultRepository = analysisResultRepository;
     }
 
     @Override
@@ -109,18 +113,20 @@ public class ImageInspectionManagementServiceImpl implements ImageInspectionMana
                         "Invalid file type. Only image files are allowed");
             }
 
-            // Set initial status as "Not started" and change to "In progress"
-            imageRequest.setStatus("In progress");
+            // Set initial status as "Not Started"
+            imageRequest.setStatus("Not Started");
 
             ImageInspect imageInspect = imageInspectMapper.mapRequestToEntityCreate(imageRequest, imageData);
             imageInspectRepository.save(imageInspect);
 
-            // Update status to "Completed" after successful save
-            imageInspect.setStatus("Completed");
-            imageInspectRepository.save(imageInspect);
-
-            return new ApiResponse<>(ResponseCodeEnum.SUCCESS.code(),
+            // Return response immediately to frontend
+            ApiResponse<Void> response = new ApiResponse<>(ResponseCodeEnum.SUCCESS.code(),
                     imageRequest.getImageType() + " image uploaded successfully");
+
+            // Note: Automatic analysis has been disabled. 
+            // Use the manual analysis endpoint to trigger analysis when needed.
+
+            return response;
 
         } catch (Exception ex) {
             log.error(LoggingAdviceConstants.EXCEPTION_STACK_TRACE, System.currentTimeMillis() - startTime,
@@ -137,7 +143,22 @@ public class ImageInspectionManagementServiceImpl implements ImageInspectionMana
             Optional<ImageInspect> imageOptional = imageInspectRepository.findBaselineImageByTransformerNo(transformerNo);
 
             if (imageOptional.isPresent()) {
-                ImageInspectResponse response = imageInspectMapper.mapEntityToResponse(imageOptional.get());
+                ImageInspect image = imageOptional.get();
+                
+                // Update status based on whether result exists for this inspection
+                String inspectionNo = image.getInspectionNo();
+                if (inspectionNo != null) {
+                    boolean hasResult = imageInspectRepository.existsByInspectionNoAndImageType(inspectionNo, "Result");
+                    String newStatus = hasResult ? "Complete" : "Not Started";
+                    
+                    // Update and save status if it has changed
+                    if (!newStatus.equals(image.getStatus())) {
+                        image.setStatus(newStatus);
+                        imageInspectRepository.save(image);
+                    }
+                }
+                
+                ImageInspectResponse response = imageInspectMapper.mapEntityToResponse(image);
                 return new ApiResponse<>(ResponseCodeEnum.SUCCESS.code(), ResponseCodeEnum.SUCCESS.message(), response);
             } else {
                 return new ApiResponse<>(ResponseCodeEnum.BAD_REQUEST.code(),
@@ -165,10 +186,6 @@ public class ImageInspectionManagementServiceImpl implements ImageInspectionMana
 
             ImageInspect existingImage = existingImageOptional.get();
 
-            // Update status to "In progress"
-            existingImage.setStatus("In progress");
-            imageInspectRepository.save(existingImage);
-
             byte[] imageData = null;
             if (imageRequest.getImageFile() != null && !imageRequest.getImageFile().isEmpty()) {
                 // Validate file size (max 100MB)
@@ -188,8 +205,8 @@ public class ImageInspectionManagementServiceImpl implements ImageInspectionMana
 
             ImageInspect updatedImage = imageInspectMapper.mapRequestToEntityUpdate(existingImage, imageRequest, imageData);
 
-            // Update status to "Completed" after successful update
-            updatedImage.setStatus("Completed");
+            // Set status to "Not Started" since analysis hasn't been done yet
+            updatedImage.setStatus("Not Started");
             imageInspectRepository.save(updatedImage);
 
             return new ApiResponse<>(ResponseCodeEnum.SUCCESS.code(), "Baseline image updated successfully");
@@ -213,7 +230,34 @@ public class ImageInspectionManagementServiceImpl implements ImageInspectionMana
                         "No baseline image found for transformer: " + transformerNo);
             }
 
+            // Get the inspection number from baseline image to clean up related data
+            String inspectionNo = imageOptional.get().getInspectionNo();
+            
+            // Delete the baseline image
             imageInspectRepository.delete(imageOptional.get());
+            
+            // Reset status of remaining thermal image(s) to "Not Started"
+            if (inspectionNo != null) {
+                Optional<ImageInspect> thermalImage = imageInspectRepository.findThermalImageByInspectionNo(inspectionNo);
+                if (thermalImage.isPresent()) {
+                    thermalImage.get().setStatus("Not Started");
+                    imageInspectRepository.save(thermalImage.get());
+                }
+                
+                // Remove result image if it exists
+                Optional<ImageInspect> resultImage = imageInspectRepository.findResultImageByInspectionNo(inspectionNo);
+                if (resultImage.isPresent()) {
+                    imageInspectRepository.delete(resultImage.get());
+                    log.info("Deleted result image for inspection: {}", inspectionNo);
+                }
+                
+                // Remove analysis result if it exists
+                if (analysisResultRepository.existsByInspectionNo(inspectionNo)) {
+                    analysisResultRepository.deleteByInspectionNo(inspectionNo);
+                    log.info("Deleted analysis result for inspection: {}", inspectionNo);
+                }
+            }
+            
             return new ApiResponse<>(ResponseCodeEnum.SUCCESS.code(), "Baseline image deleted successfully");
 
         } catch (Exception ex) {
@@ -231,7 +275,19 @@ public class ImageInspectionManagementServiceImpl implements ImageInspectionMana
             Optional<ImageInspect> imageOptional = imageInspectRepository.findThermalImageByInspectionNo(inspectionNo);
 
             if (imageOptional.isPresent()) {
-                ImageInspectResponse response = imageInspectMapper.mapEntityToResponse(imageOptional.get());
+                ImageInspect image = imageOptional.get();
+                
+                // Update status based on whether result exists for this inspection
+                boolean hasResult = imageInspectRepository.existsByInspectionNoAndImageType(inspectionNo, "Result");
+                String newStatus = hasResult ? "Complete" : "Not Started";
+                
+                // Update and save status if it has changed
+                if (!newStatus.equals(image.getStatus())) {
+                    image.setStatus(newStatus);
+                    imageInspectRepository.save(image);
+                }
+                
+                ImageInspectResponse response = imageInspectMapper.mapEntityToResponse(image);
                 return new ApiResponse<>(ResponseCodeEnum.SUCCESS.code(), ResponseCodeEnum.SUCCESS.message(), response);
             } else {
                 return new ApiResponse<>(ResponseCodeEnum.BAD_REQUEST.code(),
@@ -259,10 +315,6 @@ public class ImageInspectionManagementServiceImpl implements ImageInspectionMana
 
             ImageInspect existingImage = existingImageOptional.get();
 
-            // Update status to "In progress"
-            existingImage.setStatus("In progress");
-            imageInspectRepository.save(existingImage);
-
             byte[] imageData = null;
             if (imageRequest.getImageFile() != null && !imageRequest.getImageFile().isEmpty()) {
                 // Validate file size (max 10MB)
@@ -282,8 +334,8 @@ public class ImageInspectionManagementServiceImpl implements ImageInspectionMana
 
             ImageInspect updatedImage = imageInspectMapper.mapRequestToEntityUpdate(existingImage, imageRequest, imageData);
 
-            // Update status to "Completed" after successful update
-            updatedImage.setStatus("Completed");
+            // Set status to "Not Started" since analysis hasn't been done yet
+            updatedImage.setStatus("Not Started");
             imageInspectRepository.save(updatedImage);
 
             return new ApiResponse<>(ResponseCodeEnum.SUCCESS.code(), "Thermal image updated successfully");
@@ -307,7 +359,34 @@ public class ImageInspectionManagementServiceImpl implements ImageInspectionMana
                         "No thermal image found for inspection: " + inspectionNo);
             }
 
+            // Get transformer number to find related baseline image
+            String transformerNo = imageOptional.get().getTransformerNo();
+            
+            // Delete the thermal image
             imageInspectRepository.delete(imageOptional.get());
+            
+            // Reset status of baseline image to "Not Started"
+            if (transformerNo != null) {
+                Optional<ImageInspect> baselineImage = imageInspectRepository.findBaselineImageByTransformerNo(transformerNo);
+                if (baselineImage.isPresent()) {
+                    baselineImage.get().setStatus("Not Started");
+                    imageInspectRepository.save(baselineImage.get());
+                }
+            }
+            
+            // Remove result image if it exists
+            Optional<ImageInspect> resultImage = imageInspectRepository.findResultImageByInspectionNo(inspectionNo);
+            if (resultImage.isPresent()) {
+                imageInspectRepository.delete(resultImage.get());
+                log.info("Deleted result image for inspection: {}", inspectionNo);
+            }
+            
+            // Remove analysis result if it exists
+            if (analysisResultRepository.existsByInspectionNo(inspectionNo)) {
+                analysisResultRepository.deleteByInspectionNo(inspectionNo);
+                log.info("Deleted analysis result for inspection: {}", inspectionNo);
+            }
+            
             return new ApiResponse<>(ResponseCodeEnum.SUCCESS.code(), "Thermal image deleted successfully");
 
         } catch (Exception ex) {
@@ -315,6 +394,33 @@ public class ImageInspectionManagementServiceImpl implements ImageInspectionMana
                     ex.getMessage(), StackTraceTracker.displayStackStraceArray(ex.getStackTrace()));
             throw new BaseException(ResponseCodeEnum.INTERNAL_SERVER_ERROR.code(),
                     "Failed to delete thermal image for inspection: " + inspectionNo);
+        }
+    }
+
+    @Override
+    public ApiResponse<ImageInspectResponse> getResultImageByInspectionNo(String inspectionNo) throws BaseException {
+        long start = System.currentTimeMillis();
+        try {
+            Optional<ImageInspect> imageOptional = imageInspectRepository.findResultImageByInspectionNo(inspectionNo);
+
+            if (imageOptional.isPresent()) {
+                ImageInspect image = imageOptional.get();
+                
+                // Result images always have "Complete" status
+                image.setStatus("Complete");
+                
+                ImageInspectResponse response = imageInspectMapper.mapEntityToResponse(image);
+                return new ApiResponse<>(ResponseCodeEnum.SUCCESS.code(), ResponseCodeEnum.SUCCESS.message(), response);
+            } else {
+                return new ApiResponse<>(ResponseCodeEnum.BAD_REQUEST.code(),
+                        "No result image found for inspection: " + inspectionNo);
+            }
+
+        } catch (Exception ex) {
+            log.error(LoggingAdviceConstants.EXCEPTION_STACK_TRACE, System.currentTimeMillis() - start,
+                    ex.getMessage(), StackTraceTracker.displayStackStraceArray(ex.getStackTrace()));
+            throw new BaseException(ResponseCodeEnum.INTERNAL_SERVER_ERROR.code(),
+                    "Failed to retrieve result image for inspection: " + inspectionNo);
         }
     }
 }

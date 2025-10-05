@@ -1,0 +1,16 @@
+services:
+  # Spring Boot Application
+  - type: web
+    name: transformer-inspection-app
+    env: docker
+    plan: free
+    dockerfilePath: ./Dockerfile.render
+    healthCheckPath: /transformer-thermal-inspection/actuator/health
+    envVars:
+      # These will be set in Render Dashboard after creating PostgreSQL database
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false

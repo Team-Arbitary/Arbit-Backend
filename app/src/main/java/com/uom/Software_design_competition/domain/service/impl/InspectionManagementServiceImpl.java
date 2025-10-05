@@ -96,6 +96,8 @@ public class InspectionManagementServiceImpl implements InspectionManagementServ
 
             List<InspectionRecordsResponse> responseList = new ArrayList<>();
             for (InspectionRecords entity : inspectionEntities) {
+                // Use the actual status from the database
+                // (This preserves the "Completed" status set after successful analysis)
                 responseList.add(inspectionRecordsMapper.mapEntityToResponse(entity));
             }
 
@@ -116,6 +118,8 @@ public class InspectionManagementServiceImpl implements InspectionManagementServ
                     .orElseThrow(() -> new BaseException(ResponseCodeEnum.BAD_REQUEST.code(),
                             "Inspection record not found with ID: " + id));
 
+            // Return the inspection record with its actual status from the database
+            // (This preserves the "Completed" status set after successful analysis)
             return new ApiResponse<>(ResponseCodeEnum.SUCCESS.code(), ResponseCodeEnum.SUCCESS.message(), inspectionRecord);
         } catch (BaseException ex) {
             log.error(LoggingAdviceConstants.EXCEPTION_STACK_TRACE, System.currentTimeMillis() - start,
@@ -136,6 +140,8 @@ public class InspectionManagementServiceImpl implements InspectionManagementServ
             List<InspectionRecordsResponse> responseList = new ArrayList<>();
 
             for (InspectionRecords entity : inspectionEntities) {
+                // Use the actual status from the database
+                // (This preserves the "Completed" status set after successful analysis)
                 responseList.add(inspectionRecordsMapper.mapEntityToResponse(entity));
             }
 

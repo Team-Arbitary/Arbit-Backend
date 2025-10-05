@@ -1,0 +1,54 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE
+.vscode
+.idea
+*.iml
+.devcontainer
+
+# Build artifacts
+app/target/
+**/target/
+*.jar
+*.war
+*.ear
+
+# Logs
+*.log
+logs/
+nohup.out
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation
+README.md
+*.md
+docs/
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Docker
+docker-compose*.yml
+Dockerfile*
+.dockerignore
+
+# Maven wrapper
+app/.mvn/
+app/mvnw
+app/mvnw.cmd
+
+# Environment files
+.env
+.env.*
+
+# Temporary files
+tmp/
+temp/
+*.tmp

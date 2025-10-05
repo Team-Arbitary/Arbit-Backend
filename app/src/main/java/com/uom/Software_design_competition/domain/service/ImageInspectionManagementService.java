@@ -19,6 +19,9 @@ public interface ImageInspectionManagementService {
     ApiResponse<ImageInspectResponse> getThermalImageByInspectionNo(String inspectionNo) throws BaseException;
     ApiResponse<Void> updateThermalImageByInspectionNo(String inspectionNo, ImageRequest imageRequest) throws BaseException;
     ApiResponse<Void> deleteThermalImageByInspectionNo(String inspectionNo) throws BaseException;
+
+    // Result Image Operations
+    ApiResponse<ImageInspectResponse> getResultImageByInspectionNo(String inspectionNo) throws BaseException;
 }
     // Get comparison images for side-by-side display
    // ApiResponse<ImageInspectResponse[]> getComparisonImages(String transformerNo, String inspectionNo) throws BaseException;

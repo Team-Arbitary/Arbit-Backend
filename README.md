@@ -6,16 +6,51 @@ This repository contains backend for managing transformer thermal inspections, b
 
 ## Prerequisites
 
-Ensure the following are installed on your system before proceeding with the setup:
+### Option 1: Docker (Recommended)
+* **Docker** 20.10+
+* **Docker Compose** 2.0+
 
-* **JDK 17+**
+### Option 2: Local Development
+* **JDK 21**
 * **Maven 3.9.+**
 * **PostgreSQL**
 * **IntelliJ IDEA** or **VS Code**
 
 -----
 
-## Setup Instructions
+## Quick Start with Docker 🐳
+
+The easiest way to run the application is using Docker:
+
+```bash
+# Clone the repository
+git clone <repository-url>
+cd Arbit-Backend
+
+# Start the application with database
+docker-compose up -d
+
+# View logs
+docker-compose logs -f app
+```
+
+The application will be available at: **http://localhost:5509**
+
+For more Docker commands and options, see [DOCKER.md](DOCKER.md)
+
+### Using Makefile Commands
+
+```bash
+make up          # Start production containers
+make dev-up      # Start development containers with hot reload
+make logs        # View application logs
+make down        # Stop containers
+make clean       # Clean up everything
+```
+
+-----
+
+## Setup Instructions (Local Development)
 
 ### 1. Database Configuration
 

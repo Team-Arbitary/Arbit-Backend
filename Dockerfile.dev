@@ -1,0 +1,27 @@
+# Development Dockerfile - Faster builds, includes dev tools
+FROM eclipse-temurin:21-jdk-alpine
+
+WORKDIR /app
+
+# Install Maven
+RUN apk add --no-cache curl tar bash procps \
+    && curl -fsSL https://archive.apache.org/dist/maven/maven-3/3.9.9/binaries/apache-maven-3.9.9-bin.tar.gz | tar xzf - -C /opt \
+    && ln -s /opt/apache-maven-3.9.9 /opt/maven \
+    && ln -s /opt/maven/bin/mvn /usr/local/bin/mvn
+
+# Copy Maven wrapper and pom.xml
+COPY app/mvnw* ./
+COPY app/.mvn ./.mvn
+COPY app/pom.xml ./
+
+# Download dependencies
+RUN chmod +x mvnw && ./mvnw dependency:go-offline -B || true
+
+# Copy application source
+COPY app/src ./src
+
+# Expose application and debug ports
+EXPOSE 5509 5005
+
+# Run with hot reload enabled
+CMD ["./mvnw", "spring-boot:run", "-Dspring-boot.run.jvmArguments=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"]

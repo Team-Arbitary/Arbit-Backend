@@ -16,6 +16,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("${base-url.context}" + "/image-inspection-management")
+@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:3000", "http://127.0.0.1:8080", "https://arbit-frontend.vercel.app"}, 
+             allowCredentials = "true")
 @Slf4j
 public class ImageInspectionManagementController extends BaseController {
 
@@ -100,6 +102,17 @@ public class ImageInspectionManagementController extends BaseController {
         long startTime = System.currentTimeMillis();
         log.info(LoggingAdviceConstants.REQUEST_INITIATED, request.getMethod(), request.getRequestURI());
         ApiResponse<Void> resp = imageInspectionManagementService.deleteThermalImageByInspectionNo(inspectionNo);
+        log.info(LoggingAdviceConstants.REQUEST_TERMINATED, System.currentTimeMillis() - startTime, resp.getResponseDescription());
+        return setResponseEntity(resp);
+    }
+
+    // API 8: Get Result Image by Inspection Number
+    @GetMapping("/result/{inspectionNo}")
+    public ResponseEntity<ApiResponse<ImageInspectResponse>> getResultImage(@PathVariable String inspectionNo,
+                                                                            HttpServletRequest request) throws BaseException {
+        long startTime = System.currentTimeMillis();
+        log.info(LoggingAdviceConstants.REQUEST_INITIATED, request.getMethod(), request.getRequestURI());
+        ApiResponse<ImageInspectResponse> resp = imageInspectionManagementService.getResultImageByInspectionNo(inspectionNo);
         log.info(LoggingAdviceConstants.REQUEST_TERMINATED, System.currentTimeMillis() - startTime, resp.getResponseDescription());
         return setResponseEntity(resp);
     }

@@ -4,6 +4,11 @@ server:
 base-url:
   context: /transformer-thermal-inspection
 
+# Analysis API configuration
+analysis:
+  api:
+    url: http://192.248.10.121:8082
+
 log:
   identifierKey: UUID
   isDebug: true
@@ -15,9 +20,9 @@ info:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/trasformer_inspection_db
-    username: postgres
-    password: 1234
+    url: jdbc:postgresql://dpg-d3gb8du3jp1c73ek2cl0-a.singapore-postgres.render.com:5432/transformer_inspection_db
+    username: transformer_inspection_db_user
+    password: b0NTLBIGpuUPM5FIQqqgvuh8gkEJZExX
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 20
@@ -25,6 +30,10 @@ spring:
       connection-timeout: 20000
       idle-timeout: 300000
       leak-detection-threshold: 60000
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
 
   jpa:
     hibernate:
