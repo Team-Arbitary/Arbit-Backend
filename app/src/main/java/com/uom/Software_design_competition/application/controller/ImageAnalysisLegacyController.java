@@ -12,16 +12,21 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Legacy controller to maintain backward compatibility with existing frontend.
+ * Provides the same endpoints under /transformer-thermal-inspection path.
+ * New integrations should use /api/v1/image-analysis instead.
+ */
 @RestController
-@RequestMapping("/api/v1/image-analysis")
+@RequestMapping("${base-url.context}" + "/image-analysis")
 @CrossOrigin(origins = {"http://localhost:8080", "http://localhost:3000", "http://127.0.0.1:8080", "https://arbit-frontend.vercel.app"}, 
              allowCredentials = "true")
 @Slf4j
-public class ImageAnalysisController extends BaseController {
+public class ImageAnalysisLegacyController extends BaseController {
 
     private final ImageAnalysisService imageAnalysisService;
 
-    public ImageAnalysisController(ImageAnalysisService imageAnalysisService) {
+    public ImageAnalysisLegacyController(ImageAnalysisService imageAnalysisService) {
         this.imageAnalysisService = imageAnalysisService;
     }
 
@@ -55,21 +60,6 @@ public class ImageAnalysisController extends BaseController {
         long startTime = System.currentTimeMillis();
         log.info(LoggingAdviceConstants.REQUEST_INITIATED, request.getMethod(), request.getRequestURI());
         ApiResponse<AnalysisResult> resp = imageAnalysisService.getAnalysisResult(inspectionNo);
-        log.info(LoggingAdviceConstants.REQUEST_TERMINATED, System.currentTimeMillis() - startTime, resp.getResponseDescription());
-        return setResponseEntity(resp);
-    }
-
-    // API 6: Update Analysis Result JSON
-    @PutMapping("/result/update/{inspectionNo}/{transformerNo}")
-    public ResponseEntity<ApiResponse<AnalysisResult>> updateAnalysisResultJson(
-            @PathVariable String inspectionNo,
-            @PathVariable String transformerNo,
-            @RequestBody String analysisResultJson,
-            HttpServletRequest request) throws BaseException {
-        long startTime = System.currentTimeMillis();
-        log.info(LoggingAdviceConstants.REQUEST_INITIATED, request.getMethod(), request.getRequestURI());
-        log.info("Received update request for inspection: {}, transformer: {}", inspectionNo, transformerNo);
-        ApiResponse<AnalysisResult> resp = imageAnalysisService.updateAnalysisResultJson(inspectionNo, transformerNo, analysisResultJson);
         log.info(LoggingAdviceConstants.REQUEST_TERMINATED, System.currentTimeMillis() - startTime, resp.getResponseDescription());
         return setResponseEntity(resp);
     }
