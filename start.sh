@@ -34,15 +34,27 @@ SERVER_PORT=5509
 SPRING_PROFILES_ACTIVE=prod
 
 # Analysis API (optional)
-ANALYSIS_API_URL=http://192.248.10.121:8082
+ANALYSIS_API_URL=http://localhost:8000
 EOF
     echo "✅ Created .env file with default values"
 fi
 
 # Parse command line arguments
 MODE="production"
+CLI_PORT=""
 if [ "$1" = "dev" ] || [ "$1" = "development" ]; then
     MODE="development"
+    shift
+fi
+
+# Optional first non-mode arg as port override
+if [ -n "$1" ]; then
+    CLI_PORT="$1"
+fi
+
+if [ -n "$CLI_PORT" ]; then
+    echo "🔁 Using CLI provided port: $CLI_PORT"
+    export SERVER_PORT="$CLI_PORT"
 fi
 
 if [ "$MODE" = "development" ]; then
@@ -52,6 +64,8 @@ if [ "$MODE" = "development" ]; then
     docker-compose -f docker-compose.dev.yml up -d
 else
     echo "🏭 Starting in PRODUCTION mode..."
+    # Make sure docker-compose has access to .env variables
+    export $(grep -v '^#' .env | xargs)
     docker-compose up -d
 fi
 
@@ -65,9 +79,10 @@ if docker-compose ps | grep -q "Up"; then
     echo ""
     echo "✅ Application started successfully!"
     echo ""
+    APP_PORT=${SERVER_PORT:-5509}
     echo "📍 Access the application:"
-    echo "   🌐 Application: http://localhost:5509"
-    echo "   ❤️  Health Check: http://localhost:5509/transformer-thermal-inspection/actuator/health"
+    echo "   🌐 Application: http://localhost:${APP_PORT}"
+    echo "   ❤️  Health Check: http://localhost:${APP_PORT}/transformer-thermal-inspection/actuator/health"
     echo ""
     echo "📊 Useful commands:"
     echo "   View logs:     docker-compose logs -f app"
