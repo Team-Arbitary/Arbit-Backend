@@ -368,6 +368,49 @@ public class ImageAnalysisServiceImpl implements ImageAnalysisService {
 
     @Override
     @Transactional
+    public ApiResponse<AnalysisResult> updateAnalysisResultJson(String inspectionNo, String transformerNo, String analysisResultJson) throws BaseException {
+        try {
+            log.info("Updating analysis result JSON for inspection: {}, transformer: {}", inspectionNo, transformerNo);
+
+            // Find existing analysis result
+            Optional<AnalysisResult> existingResult = analysisResultRepository.findByInspectionNo(inspectionNo);
+
+            if (!existingResult.isPresent()) {
+                log.warn("No analysis result found for inspection: {}", inspectionNo);
+                return new ApiResponse<>(ResponseCodeEnum.BAD_REQUEST.code(),
+                        "No analysis result found for inspection: " + inspectionNo);
+            }
+
+            AnalysisResult analysisResult = existingResult.get();
+
+            // Validate that transformer number matches
+            if (!analysisResult.getTransformerNo().equals(transformerNo)) {
+                log.warn("Transformer number mismatch. Expected: {}, Got: {}", 
+                        analysisResult.getTransformerNo(), transformerNo);
+                return new ApiResponse<>(ResponseCodeEnum.BAD_REQUEST.code(),
+                        "Transformer number mismatch");
+            }
+
+            // Update the JSON
+            analysisResult.setAnalysisResultJson(analysisResultJson);
+            analysisResult.setAnalysisDate(java.time.LocalDateTime.now());
+
+            // Save the updated result
+            analysisResultRepository.save(analysisResult);
+
+            log.info("Successfully updated analysis result JSON for inspection: {}", inspectionNo);
+            return new ApiResponse<>(ResponseCodeEnum.SUCCESS.code(),
+                    "Analysis result JSON updated successfully", analysisResult);
+
+        } catch (Exception ex) {
+            log.error("Error updating analysis result JSON for inspection {}: {}", inspectionNo, ex.getMessage(), ex);
+            throw new BaseException(ResponseCodeEnum.INTERNAL_SERVER_ERROR.code(),
+                    "Failed to update analysis result JSON: " + ex.getMessage());
+        }
+    }
+
+    @Override
+    @Transactional
     public String testStatusUpdate(String inspectionNo) throws BaseException {
         try {
             log.info("Testing status update for inspection number: {}", inspectionNo);

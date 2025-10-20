@@ -38,6 +38,11 @@ public interface ImageAnalysisService {
     ApiResponse<java.util.List<AnalysisResult>> getAnalysisResultsByTransformer(String transformerNo) throws BaseException;
 
     /**
+     * Update analysis result JSON for an inspection
+     */
+    ApiResponse<AnalysisResult> updateAnalysisResultJson(String inspectionNo, String transformerNo, String analysisResultJson) throws BaseException;
+
+    /**
      * Test method to directly update inspection record status (for testing ID fallback logic)
      */
     String testStatusUpdate(String inspectionNo) throws BaseException;
