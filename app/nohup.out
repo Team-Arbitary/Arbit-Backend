@@ -111,3 +111,8 @@ Hibernate:
     order by
         ar1_0.analysis_date desc
 2025-10-21 22:11:49 [http-nio-0.0.0.0-5509-exec-6] INFO  c.u.S.a.c.ImageAnalysisController - REQUEST_TERMINATED|2539|REASON:Analysis results retrieved successfully
+2025-10-21 22:14:38 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2025-10-21 22:14:40 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2025-10-21 22:14:40 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-10-21 22:14:40 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-10-21 22:14:42 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
