@@ -23,8 +23,8 @@ import java.util.List;
 
 @RestController
 @RequestMapping("${base-url.context}" + "/transformer-management")
-@CrossOrigin(origins = {"http://localhost:8080", "http://localhost:3000", "http://127.0.0.1:8080", "https://arbit-frontend.vercel.app"}, 
-             allowCredentials = "true")
+@CrossOrigin(origins = { "http://localhost:8080", "http://localhost:3000", "http://127.0.0.1:8080",
+        "https://arbit-frontend.vercel.app" }, allowCredentials = "true")
 @Slf4j
 @Tag(name = "Transformer Management", description = "Transformer record management APIs")
 public class TransformerManagementController extends BaseController {
@@ -36,56 +36,70 @@ public class TransformerManagementController extends BaseController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<ApiResponse<Void>> addTransformerRecord(@Valid @RequestBody TransformerRecordsRequest transformerRecordsRequest, HttpServletRequest request) throws BaseException {
+    public ResponseEntity<ApiResponse<Void>> addTransformerRecord(
+            @Valid @RequestBody TransformerRecordsRequest transformerRecordsRequest, HttpServletRequest request)
+            throws BaseException {
         long startTime = System.currentTimeMillis();
         log.info(LoggingAdviceConstants.REQUEST_INITIATED, request.getMethod(), request.getRequestURI());
         ApiResponse<Void> resp = transformerManagementService.saveRecord(transformerRecordsRequest);
-        log.info(LoggingAdviceConstants.REQUEST_TERMINATED, System.currentTimeMillis() - startTime, resp.getResponseDescription());
+        log.info(LoggingAdviceConstants.REQUEST_TERMINATED, System.currentTimeMillis() - startTime,
+                resp.getResponseDescription());
         return setResponseEntity(resp);
     }
 
     @GetMapping("/view/{id}")
-    public ResponseEntity<ApiResponse<TransformerRecords>> getTransformerById(@PathVariable Long id, HttpServletRequest request) throws BaseException {
+    public ResponseEntity<ApiResponse<TransformerRecords>> getTransformerById(@PathVariable Long id,
+            HttpServletRequest request) throws BaseException {
         long startTime = System.currentTimeMillis();
         log.info(LoggingAdviceConstants.REQUEST_INITIATED, request.getMethod(), request.getRequestURI());
         ApiResponse<TransformerRecords> resp = transformerManagementService.getTransformerById(id);
-        log.info(LoggingAdviceConstants.REQUEST_TERMINATED, System.currentTimeMillis() - startTime, resp.getResponseDescription());
+        log.info(LoggingAdviceConstants.REQUEST_TERMINATED, System.currentTimeMillis() - startTime,
+                resp.getResponseDescription());
         return setResponseEntity(resp);
     }
 
     @GetMapping("/view-all")
-    public ResponseEntity<ApiResponse<List<TransformerRecordsResponse>>> getAllTransformers(HttpServletRequest request) throws BaseException {
+    public ResponseEntity<ApiResponse<List<TransformerRecordsResponse>>> getAllTransformers(HttpServletRequest request)
+            throws BaseException {
         long startTime = System.currentTimeMillis();
         log.info(LoggingAdviceConstants.REQUEST_INITIATED, request.getMethod(), request.getRequestURI());
         ApiResponse<List<TransformerRecordsResponse>> resp = transformerManagementService.getAllTransformers();
-        log.info(LoggingAdviceConstants.REQUEST_TERMINATED, System.currentTimeMillis() - startTime, resp.getResponseDescription());
+        log.info(LoggingAdviceConstants.REQUEST_TERMINATED, System.currentTimeMillis() - startTime,
+                resp.getResponseDescription());
         return setResponseEntity(resp);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ApiResponse<TransformerRecords>> updateTransformer(@RequestBody TransformerRecords transformerRecords, HttpServletRequest request) throws BaseException {
+    public ResponseEntity<ApiResponse<TransformerRecords>> updateTransformer(
+            @RequestBody TransformerRecords transformerRecords, HttpServletRequest request) throws BaseException {
         long startTime = System.currentTimeMillis();
         log.info(LoggingAdviceConstants.REQUEST_INITIATED, request.getMethod(), request.getRequestURI());
         ApiResponse<TransformerRecords> resp = transformerManagementService.updateTransformer(transformerRecords);
-        log.info(LoggingAdviceConstants.REQUEST_TERMINATED, System.currentTimeMillis() - startTime, resp.getResponseDescription());
+        log.info(LoggingAdviceConstants.REQUEST_TERMINATED, System.currentTimeMillis() - startTime,
+                resp.getResponseDescription());
         return setResponseEntity(resp);
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteTransformer(@PathVariable Long id, HttpServletRequest request) throws BaseException {
+    public ResponseEntity<ApiResponse<Void>> deleteTransformer(@PathVariable Long id, HttpServletRequest request)
+            throws BaseException {
         long startTime = System.currentTimeMillis();
         log.info(LoggingAdviceConstants.REQUEST_INITIATED, request.getMethod(), request.getRequestURI());
         ApiResponse<Void> resp = transformerManagementService.deleteTransformerById(id);
-        log.info(LoggingAdviceConstants.REQUEST_TERMINATED, System.currentTimeMillis() - startTime, resp.getResponseDescription());
+        log.info(LoggingAdviceConstants.REQUEST_TERMINATED, System.currentTimeMillis() - startTime,
+                resp.getResponseDescription());
         return setResponseEntity(resp);
     }
 
     @PostMapping("/filter")
-    public ResponseEntity<ApiResponse<List<TransformerRecords>>> filterTransformerRecords(@RequestBody FilterRequest filterRequest, HttpServletRequest httpServletRequest) throws BaseException {
+    public ResponseEntity<ApiResponse<List<TransformerRecords>>> filterTransformerRecords(
+            @RequestBody FilterRequest filterRequest, HttpServletRequest httpServletRequest) throws BaseException {
         long startTime = System.currentTimeMillis();
-        log.info(LoggingAdviceConstants.REQUEST_INITIATED, httpServletRequest.getMethod(), httpServletRequest.getRequestURI());
+        log.info(LoggingAdviceConstants.REQUEST_INITIATED, httpServletRequest.getMethod(),
+                httpServletRequest.getRequestURI());
         ApiResponse<List<TransformerRecords>> resp = transformerManagementService.filterRecords(filterRequest);
-        log.info(LoggingAdviceConstants.REQUEST_TERMINATED, System.currentTimeMillis() - startTime, resp.getResponseDescription());
+        log.info(LoggingAdviceConstants.REQUEST_TERMINATED, System.currentTimeMillis() - startTime,
+                resp.getResponseDescription());
         return ResponseEntity.status(HttpStatus.OK).body(resp);
     }
 
