@@ -368,7 +368,8 @@ public class ImageAnalysisServiceImpl implements ImageAnalysisService {
 
     @Override
     @Transactional
-    public ApiResponse<AnalysisResult> updateAnalysisResultJson(String inspectionNo, String transformerNo, String analysisResultJson) throws BaseException {
+    public ApiResponse<AnalysisResult> updateAnalysisResultJson(String inspectionNo, String transformerNo,
+            String analysisResultJson) throws BaseException {
         try {
             log.info("Updating analysis result JSON for inspection: {}, transformer: {}", inspectionNo, transformerNo);
 
@@ -385,7 +386,7 @@ public class ImageAnalysisServiceImpl implements ImageAnalysisService {
 
             // Validate that transformer number matches
             if (!analysisResult.getTransformerNo().equals(transformerNo)) {
-                log.warn("Transformer number mismatch. Expected: {}, Got: {}", 
+                log.warn("Transformer number mismatch. Expected: {}, Got: {}",
                         analysisResult.getTransformerNo(), transformerNo);
                 return new ApiResponse<>(ResponseCodeEnum.BAD_REQUEST.code(),
                         "Transformer number mismatch");

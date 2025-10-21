@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateAnalysisResultRequest {
-    
+
     private String inspectionNo;
     private String transformerNo;
     private String analysisResultJson; // The updated JSON from frontend

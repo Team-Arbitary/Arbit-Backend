@@ -18,7 +18,8 @@ public interface ImageAnalysisService {
     ApiResponse<AnalysisResult> performAnalysis(String inspectionNo, String transformerNo) throws BaseException;
 
     /**
-     * Perform analysis using only inspection number (gets transformer from thermal image)
+     * Perform analysis using only inspection number (gets transformer from thermal
+     * image)
      */
     ApiResponse<AnalysisResult> performAnalysisWithInspectionNo(String inspectionNo) throws BaseException;
 
@@ -28,22 +29,26 @@ public interface ImageAnalysisService {
     ApiResponse<AnalysisResult> getAnalysisResult(String inspectionNo) throws BaseException;
 
     /**
-     * Update inspection status based on image availability and analysis state (async)
+     * Update inspection status based on image availability and analysis state
+     * (async)
      */
     void updateInspectionStatus(String inspectionNo, String transformerNo);
 
     /**
      * Get all analysis results for a transformer
      */
-    ApiResponse<java.util.List<AnalysisResult>> getAnalysisResultsByTransformer(String transformerNo) throws BaseException;
+    ApiResponse<java.util.List<AnalysisResult>> getAnalysisResultsByTransformer(String transformerNo)
+            throws BaseException;
 
     /**
      * Update analysis result JSON for an inspection
      */
-    ApiResponse<AnalysisResult> updateAnalysisResultJson(String inspectionNo, String transformerNo, String analysisResultJson) throws BaseException;
+    ApiResponse<AnalysisResult> updateAnalysisResultJson(String inspectionNo, String transformerNo,
+            String analysisResultJson) throws BaseException;
 
     /**
-     * Test method to directly update inspection record status (for testing ID fallback logic)
+     * Test method to directly update inspection record status (for testing ID
+     * fallback logic)
      */
     String testStatusUpdate(String inspectionNo) throws BaseException;
 }

@@ -38,7 +38,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update   # options: validate | update | create | create-drop
+      ddl-auto: update # options: validate | update | create | create-drop
     show-sql: true
     properties:
       hibernate:

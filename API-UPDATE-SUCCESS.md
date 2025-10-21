@@ -1,16 +1,19 @@
 # API Update Analysis Result - Success ✅
 
 ## Summary
+
 Successfully implemented and tested the endpoint to update inspection analysis results from the frontend.
 
 ## Final Endpoint Details
 
 ### URL
+
 ```
 PUT http://localhost:5509/api/v1/image-analysis/result/update/{inspectionNo}/{transformerNo}
 ```
 
 ### Example
+
 ```bash
 curl -X PUT 'http://localhost:5509/api/v1/image-analysis/result/update/76/TX-1345' \
   -H 'Content-Type: application/json' \
@@ -20,15 +23,18 @@ curl -X PUT 'http://localhost:5509/api/v1/image-analysis/result/update/76/TX-134
 ## Issues Resolved
 
 ### Issue 1: 404 Error
+
 **Problem**: Frontend was calling `/api/v1/image-analysis/result/...` but backend was configured with `/transformer-thermal-inspection`
 
 **Solution**: Changed `base-url.context` in `application.yml`:
+
 ```yaml
 base-url:
-  context: /api/v1  # Changed from /transformer-thermal-inspection
+  context: /api/v1 # Changed from /transformer-thermal-inspection
 ```
 
 ### Issue 2: Path Conflict
+
 **Problem**: Initial PUT mapping at `/result/{inspectionNo}/{transformerNo}` could conflict with GET endpoint
 
 **Solution**: Changed path to `/result/update/{inspectionNo}/{transformerNo}`
@@ -36,9 +42,11 @@ base-url:
 ## Files Modified
 
 1. **application.yml**
+
    - Updated `base-url.context` to `/api/v1`
 
 2. **ImageAnalysisController.java**
+
    - Added PUT endpoint at `/result/update/{inspectionNo}/{transformerNo}`
 
 3. **ImageAnalysisService.java** & **ImageAnalysisServiceImpl.java**
@@ -47,11 +55,13 @@ base-url:
 ## Testing Results
 
 ✅ **Test 1**: Simple update
+
 ```bash
 curl -X PUT 'http://localhost:5509/api/v1/image-analysis/result/update/76/TX-1345' \
   -H 'Content-Type: application/json' \
   -d '[{"id":"1","anomalyState":"Faulty"}]'
 ```
+
 **Result**: Status 200 OK, data updated successfully
 
 ## Frontend Integration
