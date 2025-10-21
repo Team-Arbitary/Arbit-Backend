@@ -23,7 +23,8 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("Transformer Thermal Inspection API")
                         .version("1.0.0")
-                        .description("API documentation for Transformer Thermal Inspection System - A comprehensive platform for managing transformer inspections, baseline/thermal image uploads, and AI-powered thermal anomaly analysis.")
+                        .description(
+                                "API documentation for Transformer Thermal Inspection System - A comprehensive platform for managing transformer inspections, baseline/thermal image uploads, and AI-powered thermal anomaly analysis.")
                         .contact(new Contact()
                                 .name("Team Arbitary")
                                 .email("support@arbitary.com")
@@ -37,7 +38,6 @@ public class OpenApiConfig {
                                 .description("Local Development Server"),
                         new Server()
                                 .url("https://arbit-backend.vercel.app")
-                                .description("Production Server (if deployed)")
-                ));
+                                .description("Production Server (if deployed)")));
     }
 }

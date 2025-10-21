@@ -33,8 +33,7 @@ public class BaselineImageController {
                 request.getData(),
                 null,
                 request.getUploader(),
-                request.getEnvironmentCondition()
-        );
+                request.getEnvironmentCondition());
         BaselineImage savedImage = baselineImageService.saveImage(image);
         return ResponseEntity.ok(new BaselineImageResponse(
                 savedImage.getId(),
@@ -42,8 +41,7 @@ public class BaselineImageController {
                 savedImage.getName(),
                 savedImage.getType(),
                 savedImage.getUploader(),
-                savedImage.getEnvironmentCondition()
-        ));
+                savedImage.getEnvironmentCondition()));
     }
 
     @GetMapping("/{id}")
