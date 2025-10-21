@@ -9,6 +9,9 @@ import com.uom.Software_design_competition.application.util.exception.type.BaseE
 
 import com.uom.Software_design_competition.domain.entity.TransformerRecords;
 import com.uom.Software_design_competition.domain.service.TransformerManagementService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +26,7 @@ import java.util.List;
 @CrossOrigin(origins = {"http://localhost:8080", "http://localhost:3000", "http://127.0.0.1:8080", "https://arbit-frontend.vercel.app"}, 
              allowCredentials = "true")
 @Slf4j
+@Tag(name = "Transformer Management", description = "Transformer record management APIs")
 public class TransformerManagementController extends BaseController {
 
     private final TransformerManagementService transformerManagementService;
