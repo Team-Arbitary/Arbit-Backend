@@ -50,7 +50,6 @@ docker run -d -p 5600:5509 \
   transformer-inspection-app
 ```
 
-
 ### Option 2: Using Docker Only
 
 If you already have PostgreSQL running locally:
@@ -82,13 +81,13 @@ docker rm transformer-inspection
 
 You can override application properties using environment variables:
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `SPRING_DATASOURCE_URL` | `jdbc:postgresql://localhost:5432/trasformer_inspection_db` | Database connection URL |
-| `SPRING_DATASOURCE_USERNAME` | `postgres` | Database username |
-| `SPRING_DATASOURCE_PASSWORD` | `1234` | Database password |
-| `SERVER_PORT` | `5509` | Application port |
-| `ANALYSIS_API_URL` | `http://192.248.10.121:8082` | Python analysis API URL |
+| Variable                     | Default                                                     | Description             |
+| ---------------------------- | ----------------------------------------------------------- | ----------------------- |
+| `SPRING_DATASOURCE_URL`      | `jdbc:postgresql://localhost:5432/trasformer_inspection_db` | Database connection URL |
+| `SPRING_DATASOURCE_USERNAME` | `postgres`                                                  | Database username       |
+| `SPRING_DATASOURCE_PASSWORD` | `1234`                                                      | Database password       |
+| `SERVER_PORT`                | `5509`                                                      | Application port        |
+| `ANALYSIS_API_URL`           | `http://192.248.10.121:8082`                                | Python analysis API URL |
 
 Example with custom database:
 
@@ -140,11 +139,13 @@ docker build \
 ### Application won't start
 
 1. Check logs:
+
    ```bash
    docker-compose logs app
    ```
 
 2. Verify database is running:
+
    ```bash
    docker-compose ps postgres
    ```
@@ -157,6 +158,7 @@ docker build \
 ### Database connection issues
 
 If using `host.docker.internal` doesn't work on Linux:
+
 ```bash
 docker run -d \
   --name transformer-inspection \
@@ -168,6 +170,7 @@ docker run -d \
 ### Port already in use
 
 Change the port mapping:
+
 ```bash
 # Use port 8080 instead of 5509
 docker run -d -p 8080:5509 transformer-inspection-app
@@ -198,6 +201,7 @@ For production environments, consider:
 5. Setting resource limits
 
 Example docker-compose for production:
+
 ```yaml
 services:
   app:
@@ -205,10 +209,10 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '2'
+          cpus: "2"
           memory: 2G
         reservations:
-          cpus: '1'
+          cpus: "1"
           memory: 1G
     environment:
       SPRING_PROFILES_ACTIVE: production
