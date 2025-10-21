@@ -5,6 +5,7 @@ import com.uom.Software_design_competition.application.transport.response.ApiRes
 import com.uom.Software_design_competition.application.util.exception.type.BaseException;
 import com.uom.Software_design_competition.domain.entity.AnalysisResult;
 import com.uom.Software_design_competition.domain.service.ImageAnalysisService;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import java.util.List;
 @CrossOrigin(origins = { "http://localhost:8080", "http://localhost:3000", "http://127.0.0.1:8080",
         "https://arbit-frontend.vercel.app" }, allowCredentials = "true")
 @Slf4j
+@Hidden  // Hide legacy endpoints from Swagger UI
 public class ImageAnalysisLegacyController extends BaseController {
 
     private final ImageAnalysisService imageAnalysisService;

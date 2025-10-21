@@ -4,6 +4,9 @@ import com.uom.Software_design_competition.application.transport.request.Baselin
 import com.uom.Software_design_competition.application.transport.response.BaselineImageResponse;
 import com.uom.Software_design_competition.domain.entity.BaselineImage;
 import com.uom.Software_design_competition.domain.service.BaselineImageService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,6 +14,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/baseline-images")
+@Tag(name = "Baseline Images", description = "Baseline image upload and management APIs")
 public class BaselineImageController {
 
     private final BaselineImageService baselineImageService;
