@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/image-analysis")
-@CrossOrigin(origins = { "http://localhost:8080", "http://localhost:3000", "http://127.0.0.1:8080",
+@RequestMapping("${base-url.context}" + "/api/v1/image-analysis")
+@CrossOrigin(origins = { "http://localhost:8080", "http://localhost:3000", "http://localhost:5173", "http://127.0.0.1:8080",
                 "https://arbit-frontend.vercel.app" }, allowCredentials = "true")
 @Slf4j
 @Tag(name = "Image Analysis", description = "AI-powered thermal image analysis APIs for transformer inspection")

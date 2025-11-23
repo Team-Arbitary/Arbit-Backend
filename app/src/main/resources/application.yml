@@ -8,7 +8,7 @@ base-url:
 # Analysis API configuration
 analysis:
   api:
-    url: http://192.248.10.121:8082
+    url: http://0.0.0.0:8000
 
 log:
   identifierKey: UUID
@@ -89,8 +89,9 @@ springdoc:
 # Logging configuration
 logging:
   level:
-    com.uom.Software_design_competition: INFO
-    org.springframework.web: WARN
+    com.uom.Software_design_competition: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
   pattern:

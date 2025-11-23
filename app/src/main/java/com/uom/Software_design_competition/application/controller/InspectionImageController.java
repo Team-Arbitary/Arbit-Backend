@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/inspection-images")
+@RequestMapping("${base-url.context}" + "/api/inspection-images")
+@CrossOrigin(origins = { "http://localhost:8080", "http://localhost:3000", "http://localhost:5173", "http://127.0.0.1:8080",
+        "https://arbit-frontend.vercel.app" }, allowCredentials = "true")
 public class InspectionImageController {
 
     private final InspectionImageService inspectionImageService;
