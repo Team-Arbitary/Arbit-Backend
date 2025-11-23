@@ -7,7 +7,7 @@ import com.uom.Software_design_competition.application.transport.response.ImageI
 import com.uom.Software_design_competition.application.util.exception.type.BaseException;
 import com.uom.Software_design_competition.domain.service.ImageInspectionManagementService;
 
-import jakarta.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

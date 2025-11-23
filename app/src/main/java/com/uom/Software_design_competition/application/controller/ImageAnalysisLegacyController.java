@@ -6,7 +6,7 @@ import com.uom.Software_design_competition.application.util.exception.type.BaseE
 import com.uom.Software_design_competition.domain.entity.AnalysisResult;
 import com.uom.Software_design_competition.domain.service.ImageAnalysisService;
 import io.swagger.v3.oas.annotations.Hidden;
-import jakarta.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

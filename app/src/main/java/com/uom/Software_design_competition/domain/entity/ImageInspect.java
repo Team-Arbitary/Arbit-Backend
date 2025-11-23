@@ -1,6 +1,6 @@
 package com.uom.Software_design_competition.domain.entity;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -33,7 +33,7 @@ public class ImageInspect {
     @Column(name = "upload_date")
     private String uploadDate;
 
-    @Column(name = "image_data", columnDefinition = "LONGBLOB")
+    @Column(name = "image_data", columnDefinition = "BYTEA")
     private byte[] imageData;
 
     private String status; // "Not started", "Pending", "In progress", "Completed"

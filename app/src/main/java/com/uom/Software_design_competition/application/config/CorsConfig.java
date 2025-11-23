@@ -18,10 +18,11 @@ public class CorsConfig implements WebMvcConfigurer {
     public void addCorsMappings(@NonNull CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins(
-                    "http://localhost:8080", 
-                    "http://localhost:3000", 
-                    "http://127.0.0.1:8080",
-                    "https://arbit-frontend.vercel.app"
+                    "http://localhost:8080",
+                        "http://localhost:3000",
+                        "http://127.0.0.1:8080",
+                        "https://arbit-frontend.vercel.app",
+                        "http://100.66.135.52:8080"
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
                 .allowedHeaders("*")
@@ -37,7 +38,8 @@ public class CorsConfig implements WebMvcConfigurer {
             "http://localhost:8080",
             "http://localhost:3000",
             "http://127.0.0.1:8080",
-            "https://arbit-frontend.vercel.app"
+            "https://arbit-frontend.vercel.app",
+            "http://100.66.135.52:8080"
         ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("*"));

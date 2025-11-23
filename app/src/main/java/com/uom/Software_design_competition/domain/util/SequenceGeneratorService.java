@@ -1,7 +1,7 @@
 package com.uom.Software_design_competition.domain.util;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import org.springframework.stereotype.Service;
 
 @Service

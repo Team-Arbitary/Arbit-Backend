@@ -57,11 +57,16 @@ public class GlobalExceptionHandler {
     }
 
     private HttpStatus getHttpStatus(String errorCode) {
-        return switch (errorCode) {
-            case "4000", "4001" -> HttpStatus.BAD_REQUEST;
-            case "4003" -> HttpStatus.UNPROCESSABLE_ENTITY;
-            case "4004" -> HttpStatus.NOT_FOUND;
-            default -> HttpStatus.INTERNAL_SERVER_ERROR;
-        };
+        switch (errorCode) {
+            case "4000":
+            case "4001":
+                return HttpStatus.BAD_REQUEST;
+            case "4003":
+                return HttpStatus.UNPROCESSABLE_ENTITY;
+            case "4004":
+                return HttpStatus.NOT_FOUND;
+            default:
+                return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
     }
 }
