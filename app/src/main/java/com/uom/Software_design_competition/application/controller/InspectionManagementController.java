@@ -9,7 +9,7 @@ import com.uom.Software_design_competition.application.util.exception.type.BaseE
 import com.uom.Software_design_competition.domain.entity.InspectionRecords;
 import com.uom.Software_design_competition.domain.service.InspectionManagementService;
 
-import jakarta.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

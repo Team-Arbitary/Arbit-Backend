@@ -103,7 +103,7 @@ public class TransformerManagementServiceImpl implements TransformerManagementSe
             List<TransformerRecords> transformerEntities = transformerRecordsRepository.findAll();
             List<TransformerRecordsResponse> responseList = transformerEntities.stream()
                     .map(transformerRecordsMapper::mapEntityToResponse)
-                    .toList();
+                    .collect(java.util.stream.Collectors.toList());
 
             return new ApiResponse<>(ResponseCodeEnum.SUCCESS.code(), ResponseCodeEnum.SUCCESS.message(), responseList);
         } catch (Exception ex) {

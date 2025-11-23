@@ -1,13 +1,13 @@
 package com.uom.Software_design_competition.domain.entity;
 
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
-import jakarta.persistence.Id;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import javax.persistence.Id;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 import java.time.LocalDateTime;
 

@@ -3,8 +3,8 @@ package com.uom.Software_design_competition.application.transport.request;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 @Data
 @NoArgsConstructor
