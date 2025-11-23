@@ -17,13 +17,7 @@ public class CorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(@NonNull CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins(
-                    "http://localhost:8080",
-                        "http://localhost:3000",
-                        "http://127.0.0.1:8080",
-                        "https://arbit-frontend.vercel.app",
-                        "http://100.66.135.52:8080"
-                )
+                .allowedOriginPatterns("*")
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
                 .allowedHeaders("*")
                 .allowCredentials(true)
@@ -33,14 +27,8 @@ public class CorsConfig implements WebMvcConfigurer {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Allow specific origins including Vercel deployment
-        configuration.setAllowedOrigins(Arrays.asList(
-            "http://localhost:8080",
-            "http://localhost:3000",
-            "http://127.0.0.1:8080",
-            "https://arbit-frontend.vercel.app",
-            "http://100.66.135.52:8080"
-        ));
+        // Allow all origins for development/testing
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
