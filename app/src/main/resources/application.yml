@@ -96,3 +96,8 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# JWT configuration - make sure to set a strong secret for production via env var JWT_SECRET or property jwt.secret
+jwt:
+  # default (for dev only) — replace with a long, random secret for production or set env JWT_SECRET
+  secret: ${JWT_SECRET:dev-secret-change-me-please-2025-11-23-0123456789}
