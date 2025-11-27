@@ -18,4 +18,17 @@ public class InspectionRecordsRequest {
     private String maintenanceDate;
     private String status;
 
+    // Engineer fields
+    private String inspectorName;
+    private String engineerStatus;
+    private String voltage;
+    private String current;
+    private String recommendedAction;
+    private String additionalRemarks;
+
+    // Thermal image paths or URLs
+    private String irLeft;
+    private String irRight;
+    private String irFront;
+
 }

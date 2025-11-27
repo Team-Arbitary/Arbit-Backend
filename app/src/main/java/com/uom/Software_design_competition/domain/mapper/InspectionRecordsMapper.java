@@ -16,10 +16,19 @@ public class InspectionRecordsMapper {
         InspectionRecords entity = InspectionRecords.builder()
                 .branch(request.getBranch())
                 .transformerNo(request.getTransformerNo())
-                .dateOfInspection(request.getDateOfInspection()) // Now expects String
-                .time(request.getTime()) // Now expects String
-                .maintenanceDate(request.getMaintenanceDate()) // Now expects String
+                .dateOfInspection(request.getDateOfInspection()) // expects String
+                .time(request.getTime()) // expects String
+                .maintenanceDate(request.getMaintenanceDate()) // expects String
                 .status(request.getStatus() != null ? request.getStatus() : "Not started")
+                .inspectorName(request.getInspectorName())
+                .engineerStatus(request.getEngineerStatus())
+                .voltage(request.getVoltage())
+                .current(request.getCurrent())
+                .recommendedAction(request.getRecommendedAction())
+                .additionalRemarks(request.getAdditionalRemarks())
+                .irLeft(request.getIrLeft())
+                .irRight(request.getIrRight())
+                .irFront(request.getIrFront())
                 .build();
 
         // Automatically set formatted maintenance date if not provided
@@ -30,6 +39,10 @@ public class InspectionRecordsMapper {
         return entity;
     }
 
+    /**
+     * Update existing entity fields from the provided updateRequest entity.
+     * updateRequest is expected to be an InspectionRecords instance containing new values.
+     */
     public InspectionRecords mapRequestToEntityUpdate(InspectionRecords existingEntity, InspectionRecords updateRequest) {
         if (updateRequest.getBranch() != null) {
             existingEntity.setBranch(updateRequest.getBranch());
@@ -50,8 +63,36 @@ public class InspectionRecordsMapper {
             existingEntity.setStatus(updateRequest.getStatus());
         }
 
-        // Set maintenance date with current formatted date if needed
-        // existingEntity.setMaintenanceDate(DATE_TIME_FORMAT.format(new Date()));
+        // Engineer fields
+        if (updateRequest.getInspectorName() != null) {
+            existingEntity.setInspectorName(updateRequest.getInspectorName());
+        }
+        if (updateRequest.getEngineerStatus() != null) {
+            existingEntity.setEngineerStatus(updateRequest.getEngineerStatus());
+        }
+        if (updateRequest.getVoltage() != null) {
+            existingEntity.setVoltage(updateRequest.getVoltage());
+        }
+        if (updateRequest.getCurrent() != null) {
+            existingEntity.setCurrent(updateRequest.getCurrent());
+        }
+        if (updateRequest.getRecommendedAction() != null) {
+            existingEntity.setRecommendedAction(updateRequest.getRecommendedAction());
+        }
+        if (updateRequest.getAdditionalRemarks() != null) {
+            existingEntity.setAdditionalRemarks(updateRequest.getAdditionalRemarks());
+        }
+
+        // Thermal images
+        if (updateRequest.getIrLeft() != null) {
+            existingEntity.setIrLeft(updateRequest.getIrLeft());
+        }
+        if (updateRequest.getIrRight() != null) {
+            existingEntity.setIrRight(updateRequest.getIrRight());
+        }
+        if (updateRequest.getIrFront() != null) {
+            existingEntity.setIrFront(updateRequest.getIrFront());
+        }
 
         return existingEntity;
     }
@@ -73,7 +114,20 @@ public class InspectionRecordsMapper {
                 combinedInspectionDateTime, // Combined date and time
                 entity.getTime(), // Original time field
                 entity.getMaintenanceDate(),
-                entity.getStatus()
+                entity.getStatus(),
+
+                // Engineer fields
+                entity.getInspectorName(),
+                entity.getEngineerStatus(),
+                entity.getVoltage(),
+                entity.getCurrent(),
+                entity.getRecommendedAction(),
+                entity.getAdditionalRemarks(),
+
+                // Thermal images
+                entity.getIrLeft(),
+                entity.getIrRight(),
+                entity.getIrFront()
         );
     }
 

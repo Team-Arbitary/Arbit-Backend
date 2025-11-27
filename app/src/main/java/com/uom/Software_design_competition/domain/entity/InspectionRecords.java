@@ -42,11 +42,47 @@ public class InspectionRecords {
     @Builder.Default
     private String status = "Not started";
 
-    // Method to generate inspection number
+    // // Method to generate inspection number
+    // @PrePersist
+    // public void generateInspectionNo() {
+    //     if (this.inspectionNo == null) {
+    //         // This will be handled by the service layer
+    //     }
+    // }
+
+    // Engineer-provided fields
+    @Column(name = "inspector_name")
+    private String inspectorName;
+
+    @Column(name = "engineer_status")
+    private String engineerStatus;
+
+    @Column(name = "voltage")
+    private String voltage;
+
+    @Column(name = "current")
+    private String current;
+
+    @Column(name = "recommended_action", length = 2000)
+    private String recommendedAction;
+
+    @Column(name = "additional_remarks", length = 2000)
+    private String additionalRemarks;
+
+    // Thermal image paths
+    @Column(name = "ir_left", length = 500)
+    private String irLeft;
+
+    @Column(name = "ir_right", length = 500)
+    private String irRight;
+
+    @Column(name = "ir_front", length = 500)
+    private String irFront;
+
     @PrePersist
     public void generateInspectionNo() {
-        if (this.inspectionNo == null) {
-            // This will be handled by the service layer
+        if (this.inspectionNo == null && this.id != null) {
+            this.inspectionNo = String.format("INSP-%03d", this.id);
         }
     }
 }
