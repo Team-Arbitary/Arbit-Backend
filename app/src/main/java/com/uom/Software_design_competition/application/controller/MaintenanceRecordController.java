@@ -1,37 +1,87 @@
 package com.uom.Software_design_competition.application.controller;
 
+import com.uom.Software_design_competition.domain.service.MaintenanceRecordService;
 import com.uom.Software_design_competition.application.transport.request.MaintenanceRecordRequest;
 import com.uom.Software_design_competition.application.transport.response.ApiResponse;
 import com.uom.Software_design_competition.application.transport.response.MaintenanceRecordResponse;
-import com.uom.Software_design_competition.domain.service.MaintenanceRecordService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.uom.Software_design_competition.application.util.exception.type.BaseException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
-@RequestMapping("${base-url.context}/api/maintenance-records")
+@RequestMapping("${base-url.context}/api/maintenanceRecord")
 public class MaintenanceRecordController {
 
-    @Autowired
-    private MaintenanceRecordService maintenanceRecordService;
+    private final MaintenanceRecordService maintenanceRecordService;
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<MaintenanceRecordResponse>> createOrUpdateRecord(@RequestBody MaintenanceRecordRequest request) {
-        MaintenanceRecordResponse response = maintenanceRecordService.createOrUpdateRecord(request);
-        return ResponseEntity.ok(new ApiResponse<>("200", "Maintenance record saved successfully", response));
+    public MaintenanceRecordController(MaintenanceRecordService maintenanceRecordService) {
+        this.maintenanceRecordService = maintenanceRecordService;
+    }
+
+    @PostMapping("/save")
+    public ResponseEntity<ApiResponse<Void>> saveMaintenanceRecord(@RequestBody MaintenanceRecordRequest request) {
+        try {
+            ApiResponse<Void> response = maintenanceRecordService.saveMaintenanceRecord(request);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        } catch (BaseException ex) {
+            log.error("Error saving maintenance record", ex);
+            return new ResponseEntity<>(new ApiResponse<>(ex.getResponseCode(), ex.getMessage()),
+                    HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<ApiResponse<Void>> updateMaintenanceRecord(@RequestBody MaintenanceRecordRequest request) {
+        try {
+            ApiResponse<Void> response = maintenanceRecordService.updateMaintenanceRecord(request);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (BaseException ex) {
+            log.error("Error updating maintenance record", ex);
+            return new ResponseEntity<>(new ApiResponse<>(ex.getResponseCode(), ex.getMessage()),
+                    HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<MaintenanceRecordResponse>> getMaintenanceRecordById(@PathVariable Long id) {
+        try {
+            ApiResponse<MaintenanceRecordResponse> response = maintenanceRecordService.getMaintenanceRecordById(id);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (BaseException ex) {
+            log.error("Error fetching maintenance record", ex);
+            return new ResponseEntity<>(new ApiResponse<>(ex.getResponseCode(), ex.getMessage()),
+                    HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping("/inspection/{inspectionId}")
-    public ResponseEntity<ApiResponse<MaintenanceRecordResponse>> getRecordByInspectionId(@PathVariable Long inspectionId) {
-        MaintenanceRecordResponse response = maintenanceRecordService.getRecordByInspectionId(inspectionId);
-        return ResponseEntity.ok(new ApiResponse<>("200", "Maintenance record retrieved successfully", response));
+    public ResponseEntity<ApiResponse<List<MaintenanceRecordResponse>>> getMaintenanceRecordsByInspectionId(
+            @PathVariable Long inspectionId) {
+        try {
+            ApiResponse<List<MaintenanceRecordResponse>> response =
+                    maintenanceRecordService.getMaintenanceRecordsByInspectionId(inspectionId);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (BaseException ex) {
+            log.error("Error fetching maintenance records", ex);
+            return new ResponseEntity<>(new ApiResponse<>(ex.getResponseCode(), ex.getMessage()),
+                    HttpStatus.BAD_REQUEST);
+        }
     }
 
-    @GetMapping("/transformer/{transformerNo}")
-    public ResponseEntity<ApiResponse<List<MaintenanceRecordResponse>>> getRecordsByTransformerNo(@PathVariable String transformerNo) {
-        List<MaintenanceRecordResponse> response = maintenanceRecordService.getRecordsByTransformerNo(transformerNo);
-        return ResponseEntity.ok(new ApiResponse<>("200", "Maintenance records retrieved successfully", response));
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteMaintenanceRecord(@PathVariable Long id) {
+        try {
+            ApiResponse<Void> response = maintenanceRecordService.deleteMaintenanceRecord(id);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (BaseException ex) {
+            log.error("Error deleting maintenance record", ex);
+            return new ResponseEntity<>(new ApiResponse<>(ex.getResponseCode(), ex.getMessage()),
+                    HttpStatus.BAD_REQUEST);
+        }
     }
 }
