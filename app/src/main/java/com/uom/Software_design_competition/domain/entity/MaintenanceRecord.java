@@ -18,11 +18,44 @@ public class MaintenanceRecord {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "inspection_id", referencedColumnName = "id")
     private InspectionRecords inspection;
 
-    // Maintenance Personnel & Timings
+    // Inspector info
+    @Column(name = "inspector_name")
+    private String inspectorName;
+
+    @Column(name = "status")
+    private String status;
+
+    @Column(name = "voltage_reading")
+    private String voltageReading;
+
+    @Column(name = "current_reading")
+    private String currentReading;
+
+    @Column(name = "recommended_action", columnDefinition = "TEXT")
+    private String recommendedAction;
+
+    @Column(name = "remarks", columnDefinition = "TEXT")
+    private String remarks;
+
+    // Store full report data as JSON
+    @Column(name = "report_data", columnDefinition = "TEXT")
+    private String reportData;
+
+    // Version for history management
+    @Column(name = "version", nullable = false)
+    @Builder.Default
+    private Integer version = 1;
+
+    // Flag to indicate current/latest version
+    @Column(name = "is_current", nullable = false)
+    @Builder.Default
+    private Boolean isCurrent = true;
+
+    // Maintenance Personnel & Timings (legacy fields, kept for backward compatibility)
     @Column(name = "start_time")
     private String startTime;
 
@@ -79,6 +112,8 @@ public class MaintenanceRecord {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        if (version == null) version = 1;
+        if (isCurrent == null) isCurrent = true;
     }
 
     @PreUpdate

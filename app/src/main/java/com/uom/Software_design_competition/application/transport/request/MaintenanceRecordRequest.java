@@ -11,7 +11,16 @@ public class MaintenanceRecordRequest {
     private Long id; // optional if updating by ID
     private Long inspectionId;
 
-    // Maintenance Personnel & Timings
+    // New fields from frontend
+    private String inspectorName;
+    private String status;
+    private String voltageReading;
+    private String currentReading;
+    private String recommendedAction;
+    private String remarks;
+    private String reportData; // JSON string containing full form data
+
+    // Maintenance Personnel & Timings (legacy)
     private String startTime;
     private String completionTime;
     private String supervisedBy;
