@@ -15,7 +15,20 @@ public class MaintenanceRecordResponse {
     private Long inspectionId;
     private String transformerNo;
 
-    // Maintenance Personnel & Timings
+    // New fields
+    private String inspectorName;
+    private String status;
+    private String voltageReading;
+    private String currentReading;
+    private String recommendedAction;
+    private String remarks;
+    private String reportData; // JSON string containing full form data
+    
+    // Version/History info
+    private Integer version;
+    private Boolean isCurrent;
+
+    // Maintenance Personnel & Timings (legacy)
     private String startTime;
     private String completionTime;
     private String supervisedBy;
