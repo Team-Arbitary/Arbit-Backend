@@ -55,6 +55,51 @@ CREATE TABLE analysis_result (
     error_message TEXT
 );
 
+-- Create maintenance_records table
+CREATE TABLE IF NOT EXISTS maintenance_records (
+    id BIGSERIAL PRIMARY KEY,
+    inspection_id BIGINT REFERENCES inspection_records(id),
+    inspector_name VARCHAR(255),
+    status VARCHAR(255),
+    voltage_reading VARCHAR(255),
+    current_reading VARCHAR(255),
+    recommended_action TEXT,
+    remarks TEXT,
+    report_data TEXT,
+    version INTEGER NOT NULL DEFAULT 1,
+    is_current BOOLEAN NOT NULL DEFAULT TRUE,
+    start_time VARCHAR(255),
+    completion_time VARCHAR(255),
+    supervised_by VARCHAR(255),
+    tech_i VARCHAR(255),
+    tech_ii VARCHAR(255),
+    tech_iii VARCHAR(255),
+    helpers VARCHAR(255),
+    inspected_by VARCHAR(255),
+    inspected_by_date VARCHAR(255),
+    rectified_by VARCHAR(255),
+    rectified_by_date VARCHAR(255),
+    re_inspected_by VARCHAR(255),
+    re_inspected_by_date VARCHAR(255),
+    css VARCHAR(255),
+    css_date VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create thermal_inspection_reports table
+CREATE TABLE IF NOT EXISTS thermal_inspection_reports (
+    id BIGSERIAL PRIMARY KEY,
+    inspection_id BIGINT REFERENCES inspection_records(id),
+    transformer_no VARCHAR(255),
+    report_data TEXT,
+    version INTEGER NOT NULL DEFAULT 1,
+    is_current BOOLEAN NOT NULL DEFAULT TRUE,
+    created_by VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Create sequence for inspection numbers
 CREATE SEQUENCE inspection_sequence START 1;
 
@@ -66,6 +111,11 @@ CREATE INDEX idx_inspection_records_transformer_no ON inspection_records(transfo
 CREATE INDEX idx_inspection_records_inspection_no ON inspection_records(inspection_no);
 CREATE INDEX idx_analysis_result_inspection_no ON analysis_result(inspection_no);
 CREATE INDEX idx_analysis_result_transformer_no ON analysis_result(transformer_no);
+CREATE INDEX idx_maintenance_records_inspection_id ON maintenance_records(inspection_id);
+CREATE INDEX idx_maintenance_records_is_current ON maintenance_records(is_current);
+CREATE INDEX idx_thermal_inspection_reports_inspection_id ON thermal_inspection_reports(inspection_id);
+CREATE INDEX idx_thermal_inspection_reports_is_current ON thermal_inspection_reports(is_current);
+CREATE INDEX idx_thermal_inspection_reports_transformer_no ON thermal_inspection_reports(transformer_no);
 
 -- Display table creation status
 SELECT 'Tables created successfully!' AS status;
